@@ -1297,7 +1297,7 @@ doc/**/*.xml"
     <property name="compile.args" value="${compile.workbench.arg} ${compile.default.args}" />
   </target>
 
-  <target name="compileJdk15" depends="set-compile-args" >
+  <target name="compileJdk15" depends="set-compile-args" if="${compile.multiple.jdk}">
 
     <exec osfamily="unix" failonerror="true" executable="${unix.script}">
       <arg line="jdk1.5 ${compile.args}"/>
@@ -1307,7 +1307,7 @@ doc/**/*.xml"
     </exec>
   </target>
 
-  <target name="compileJdk16" depends="set-compile-args">
+  <target name="compileJdk16" depends="set-compile-args" if="${compile.multiple.jdk}">
     <exec osfamily="unix" failonerror="true" executable="${unix.script}">
       <arg line="jdk1.6 ${compile.args}"/>
     </exec>
