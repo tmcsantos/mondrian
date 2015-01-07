@@ -1,18 +1,18 @@
 package mondrian.rolap;
 
+import junit.framework.TestCase;
+import mondrian.olap.DriverManager;
 import mondrian.olap.*;
 import mondrian.spi.Dialect;
 import mondrian.test.TestContext;
 import mondrian.util.Pair;
 
-import junit.framework.TestCase;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
 import javax.naming.*;
 import javax.naming.spi.*;
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.*;
+import java.util.*;
 
 /**
  * Unit test for {@link RolapConnection}.
@@ -432,8 +432,7 @@ public class RolapConnectionTest extends TestCase {
                         s,
                         s.indexOf(
                             "Caused by: java.sql.SQLException: Access denied "
-                            + "for user 'bogususer'@'localhost' (using "
-                            + "password: YES)") >= 0);
+                            + "for user 'bogususer'@") >= 0);
                     break;
                 case POSTGRESQL:
                     assertTrue(
