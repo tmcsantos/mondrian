@@ -15,10 +15,10 @@
     xmlns:m="http://ant.apache.org/ivy/maven"
     xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 
-    <info organisation="pentaho" module="mondrian" revision="${project.revision}">
+    <info organisation="${ivy.artifact.group}" module="mondrian" revision="${project.revision}">
         <license name="EPL" url="http://www.eclipse.org/legal/epl-v10.html"/>
         <ivyauthor name="Julian Hyde" />
-        <repository name="pentaho-repository" url="http://repo.pentaho.org/artifactory"/>
+        <repository name="${ivy.repository.id}" url="${ivy.repository.publish}"/>
         <description homepage="http://mondrian.pentaho.com">
             Mondrian is an OLAP (online analytical processing) engine written
             in Java. It reads from JDBC data sources, aggregates data in a
