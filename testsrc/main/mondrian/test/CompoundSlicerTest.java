@@ -6,7 +6,6 @@
 *
 * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
 */
-
 package mondrian.test;
 
 import mondrian.util.Bug;
@@ -1256,11 +1255,33 @@ public class CompoundSlicerTest extends FoodMartTestCase {
         // calculated measure in slicer
         testContext.assertQueryReturns(
             " SELECT FROM SALES WHERE "
-            + "[Measures].[Profit] * { [Store].[USA].[CA], [Store].[USA].[OR]}",
+                + "[Measures].[Profit] * { [Store].[USA].[CA], [Store].[USA].[OR]}",
             "Axis #0:\n"
-            + "{[Measures].[Profit], [Store].[USA].[CA]}\n"
-            + "{[Measures].[Profit], [Store].[USA].[OR]}\n"
-            + "$181,141.98");
+                + "{[Measures].[Profit], [Store].[USA].[CA]}\n"
+                + "{[Measures].[Profit], [Store].[USA].[OR]}\n"
+                + "$181,141.98");
+    }
+
+    public void testUnsatisfiableSlicerBug() throws Exception {
+        assertQueryReturns(
+            "with\n"
+            + "set [9nthmonth] as '{Time.[1997].[Q4].[11].lag(2)}'\n"
+            + "set [1stquarter1998] as '{Time.[1997].[Q4].lag(-1)}'\n"
+            + "set [range] as '{[9nthmonth].item(0):tail(descendants([1stquarter1998].item(0), Time.[Month])).item(0)}'\n"
+            + "select non empty hierarchize({measures.[Unit Sales]}) on columns,\n"
+            + "non empty {product.[Product Name].members} on rows\n"
+            + "from sales\n"
+            + "where crossjoin({[range]}, {[Time.Weekly].[Year].[1997].[2].[1]})",
+            "Axis #0:\n"
+            + "{[Time].[1997].[Q3].[9], [Time].[Weekly].[1997].[2].[1]}\n"
+            + "{[Time].[1997].[Q4].[10], [Time].[Weekly].[1997].[2].[1]}\n"
+            + "{[Time].[1997].[Q4].[11], [Time].[Weekly].[1997].[2].[1]}\n"
+            + "{[Time].[1997].[Q4].[12], [Time].[Weekly].[1997].[2].[1]}\n"
+            + "{[Time].[1998].[Q1].[1], [Time].[Weekly].[1997].[2].[1]}\n"
+            + "{[Time].[1998].[Q1].[2], [Time].[Weekly].[1997].[2].[1]}\n"
+            + "{[Time].[1998].[Q1].[3], [Time].[Weekly].[1997].[2].[1]}\n"
+            + "Axis #1:\n"
+            + "Axis #2:\n");
     }
 }
 
