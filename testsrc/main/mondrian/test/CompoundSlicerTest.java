@@ -769,7 +769,7 @@ public class CompoundSlicerTest extends FoodMartTestCase {
             "Axis #0:\n"
             + "{[Measures].[Avg Unit Sales], [Customers].[USA].[OR]}\n"
             + "{[Measures].[Avg Unit Sales], [Customers].[USA].[CA]}\n"
-            + "6.189");
+            + "3.092");
 
         // roll up using a named set
         testContext.assertQueryReturns(
@@ -1283,6 +1283,25 @@ public class CompoundSlicerTest extends FoodMartTestCase {
             + "Axis #1:\n"
             + "Axis #2:\n");
     }
+
+    public void testCompoundSlicerAndNamedSet() {
+        getTestContext().assertQueryReturns(
+            "WITH SET [aSet] as 'Filter( Except([Store].[Store Country].Members, [Store].[Store Country].[Canada]), Measures.[Store Sales] > 0)'\n"
+            + "SELECT\n"
+            + "  { Measures.[Unit Sales] } ON COLUMNS,\n"
+            + "  [aSet] ON ROWS\n"
+            + "FROM [Sales]\n"
+            + "WHERE CrossJoin( {[Product].[Drink]}, { [Time].[1997].[Q2], [Time].[1998].[Q1]} )",
+            "Axis #0:\n"
+            + "{[Product].[Drink], [Time].[1997].[Q2]}\n"
+            + "{[Product].[Drink], [Time].[1998].[Q1]}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[Unit Sales]}\n"
+            + "Axis #2:\n"
+            + "{[Store].[USA]}\n"
+            + "Row #0: 5,895\n");
+    }
+
 }
 
 // End CompoundSlicerTest.java
