@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="PostgreSQL - FM3@rose" uuid="c08ff397-5537-43dd-b0af-1dbc674137ce">
+    <database-info product="" version="" jdbc-version="" driver-name="" driver-version=""/>
+  </data-source>
+  <data-source name="MySQL - mondrian@rose" uuid="dcbf9f08-0637-4992-a3b9-3192b64c7d51">
+    <database-info product="MySQL" version="5.5.40-0ubuntu0.12.04.1" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.34 ( Revision: jess.balint@oracle.com-20141014163213-wqbwpf1ok2kvo1om )">
+      <extra-name-characters>#@</extra-name-characters>
+      <identifier-quote-string>`</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact"/>
+    <schema name="" catalog="mondrian"/>
+    <table name="account" schema="" catalog="mondrian" type="TABLE">
+      <column name="account_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="account_parent" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="account_description" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="account_type" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="account_rollup" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="Custom_Members" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12"/>
+      <index name="i_account_id" unique="true" columns="account_id"/>
+      <index name="i_account_parent" unique="false" columns="account_parent"/>
+    </table>
+    <table name="agg_c_10_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="month_of_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="quarter" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="the_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="customer_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+    </table>
+    <table name="agg_c_14_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="promotion_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="month_of_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="quarter" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="the_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <index name="i_sls97c14cust" unique="false" columns="customer_id"/>
+      <index name="i_sls97c14prod" unique="false" columns="product_id"/>
+      <index name="i_sls97c14promo" unique="false" columns="promotion_id"/>
+      <index name="i_sls97c14store" unique="false" columns="store_id"/>
+    </table>
+    <table name="agg_c_special_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="promotion_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_month" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="time_quarter" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="time_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="store_sales_sum" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost_sum" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales_sum" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <index name="i_sls97speccust" unique="false" columns="customer_id"/>
+      <index name="i_sls97specprod" unique="false" columns="product_id"/>
+      <index name="i_sls97specpromo" unique="false" columns="promotion_id"/>
+      <index name="i_sls97specstore" unique="false" columns="store_id"/>
+    </table>
+    <table name="agg_g_ms_pcat_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="gender" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="marital_status" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="product_family" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="product_department" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="product_category" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="month_of_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="quarter" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="the_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="customer_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <index name="i_sls97gmp_gender" unique="false" columns="gender"/>
+      <index name="i_sls97gmp_ms" unique="false" columns="marital_status"/>
+      <index name="i_sls97gmp_pcat" unique="false" columns="product_category"/>
+      <index name="i_sls97gmp_pdept" unique="false" columns="product_department"/>
+      <index name="i_sls97gmp_pfam" unique="false" columns="product_family"/>
+      <index name="i_sls97gmp_tmonth" unique="false" columns="month_of_year"/>
+      <index name="i_sls97gmp_tquarter" unique="false" columns="quarter"/>
+      <index name="i_sls97gmp_tyear" unique="false" columns="the_year"/>
+    </table>
+    <table name="agg_l_03_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+    </table>
+    <table name="agg_l_04_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="customer_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+    </table>
+    <table name="agg_l_05_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="promotion_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <index name="i_sls97l05cust" unique="false" columns="customer_id"/>
+      <index name="i_sls97l05prod" unique="false" columns="product_id"/>
+      <index name="i_sls97l05promo" unique="false" columns="promotion_id"/>
+      <index name="i_sls97l05store" unique="false" columns="store_id"/>
+    </table>
+    <table name="agg_lc_06_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="city" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="state_province" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="country" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+    </table>
+    <table name="agg_lc_100_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="quarter" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="the_year" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <index name="i_sls97lc100cust" unique="false" columns="customer_id"/>
+      <index name="i_sls97lc100prod" unique="false" columns="product_id"/>
+    </table>
+    <table name="agg_ll_01_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <index name="i_sls97ll01cust" unique="false" columns="customer_id"/>
+      <index name="i_sls97ll01prod" unique="false" columns="product_id"/>
+      <index name="i_sls97ll01time" unique="false" columns="time_id"/>
+    </table>
+    <table name="agg_pl_01_sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales_sum" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost_sum" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales_sum" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="fact_count" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <index name="i_sls97pl01cust" unique="false" columns="customer_id"/>
+      <index name="i_sls97pl01prod" unique="false" columns="product_id"/>
+      <index name="i_sls97pl01time" unique="false" columns="time_id"/>
+    </table>
+    <table name="category" schema="" catalog="mondrian" type="TABLE">
+      <column name="category_id" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="category_parent" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="category_description" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="category_rollup" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <index name="i_category_id" unique="true" columns="category_id"/>
+      <index name="i_category_parent" unique="false" columns="category_parent"/>
+    </table>
+    <table name="currency" schema="" catalog="mondrian" type="TABLE">
+      <column name="currency_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="date" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
+      <column name="currency" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="conversion_ratio" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <index name="i_currency" unique="true" columns="currency_id,date"/>
+    </table>
+    <table name="customer" schema="" catalog="mondrian" type="TABLE">
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="account_num" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="lname" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="fname" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="mi" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="address1" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="address2" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="address3" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="address4" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="city" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="state_province" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="postal_code" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="country" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="customer_region_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="phone1" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="phone2" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="birthdate" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
+      <column name="marital_status" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="yearly_income" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="gender" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="total_children" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="num_children_at_home" sqlType="SMALLINT" precision="5" scale="0" nullable="false" jdbcType="5"/>
+      <column name="education" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="date_accnt_opened" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
+      <column name="member_card" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="occupation" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="houseowner" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="num_cars_owned" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="fullname" sqlType="VARCHAR" precision="60" scale="0" nullable="false" jdbcType="12"/>
+      <index name="i_customer_id" unique="true" columns="customer_id"/>
+      <index name="i_cust_acct_num" unique="false" columns="account_num"/>
+      <index name="i_cust_child_home" unique="false" columns="num_children_at_home"/>
+      <index name="i_cust_postal_code" unique="false" columns="postal_code"/>
+      <index name="i_cust_region_id" unique="false" columns="customer_region_id"/>
+      <index name="i_customer_fname" unique="false" columns="fname"/>
+      <index name="i_customer_lname" unique="false" columns="lname"/>
+    </table>
+    <table name="days" schema="" catalog="mondrian" type="TABLE">
+      <column name="day" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="week_day" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+    </table>
+    <table name="department" schema="" catalog="mondrian" type="TABLE">
+      <column name="department_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="department_description" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <index name="i_department_id" unique="true" columns="department_id"/>
+    </table>
+    <table name="employee" schema="" catalog="mondrian" type="TABLE">
+      <column name="employee_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="full_name" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="first_name" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="last_name" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="position_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="position_title" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="department_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="birth_date" sqlType="DATE" precision="10" scale="0" nullable="false" jdbcType="91"/>
+      <column name="hire_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="end_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="salary" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="supervisor_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="education_level" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="marital_status" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="gender" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="management_role" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <index name="i_employee_id" unique="true" columns="employee_id"/>
+      <index name="i_empl_dept_id" unique="false" columns="department_id"/>
+      <index name="i_empl_store_id" unique="false" columns="store_id"/>
+      <index name="i_empl_super_id" unique="false" columns="supervisor_id"/>
+    </table>
+    <table name="employee_closure" schema="" catalog="mondrian" type="TABLE">
+      <column name="employee_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="supervisor_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="distance" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <index name="i_empl_closure" unique="true" columns="supervisor_id,employee_id"/>
+      <index name="i_empl_closure_emp" unique="false" columns="employee_id"/>
+    </table>
+    <table name="expense_fact" schema="" catalog="mondrian" type="TABLE">
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="account_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="exp_date" sqlType="DATETIME" precision="19" scale="0" nullable="false" jdbcType="93"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="category_id" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="currency_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="amount" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <index name="i_expense_acct_id" unique="false" columns="account_id"/>
+      <index name="i_expense_store_id" unique="false" columns="store_id"/>
+      <index name="i_expense_time_id" unique="false" columns="time_id"/>
+    </table>
+    <table name="inventory_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="warehouse_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="units_ordered" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="units_shipped" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="warehouse_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <column name="warehouse_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <column name="supply_time" sqlType="SMALLINT" precision="5" scale="0" nullable="true" jdbcType="5"/>
+      <column name="store_invoice" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <index name="i_inv_97_prod_id" unique="false" columns="product_id"/>
+      <index name="i_inv_97_store_id" unique="false" columns="store_id"/>
+      <index name="i_inv_97_time_id" unique="false" columns="time_id"/>
+      <index name="i_inv_97_wrhse_id" unique="false" columns="warehouse_id"/>
+    </table>
+    <table name="inventory_fact_1998" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="warehouse_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="units_ordered" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="units_shipped" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="warehouse_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <column name="warehouse_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <column name="supply_time" sqlType="SMALLINT" precision="5" scale="0" nullable="true" jdbcType="5"/>
+      <column name="store_invoice" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <index name="i_inv_98_prod_id" unique="false" columns="product_id"/>
+      <index name="i_inv_98_store_id" unique="false" columns="store_id"/>
+      <index name="i_inv_98_time_id" unique="false" columns="time_id"/>
+      <index name="i_inv_98_wrhse_id" unique="false" columns="warehouse_id"/>
+    </table>
+    <table name="position" schema="" catalog="mondrian" type="TABLE">
+      <column name="position_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="position_title" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="pay_type" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="min_scale" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="max_scale" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="management_role" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <index name="i_position_id" unique="true" columns="position_id"/>
+    </table>
+    <table name="product" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_class_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="brand_name" sqlType="VARCHAR" precision="60" scale="0" nullable="true" jdbcType="12"/>
+      <column name="product_name" sqlType="VARCHAR" precision="60" scale="0" nullable="false" jdbcType="12"/>
+      <column name="SKU" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5"/>
+      <column name="SRP" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <column name="gross_weight" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <column name="net_weight" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <column name="recyclable_package" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="low_fat" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="units_per_case" sqlType="SMALLINT" precision="5" scale="0" nullable="true" jdbcType="5"/>
+      <column name="cases_per_pallet" sqlType="SMALLINT" precision="5" scale="0" nullable="true" jdbcType="5"/>
+      <column name="shelf_width" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <column name="shelf_height" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <column name="shelf_depth" sqlType="DOUBLE" precision="22" scale="0" nullable="true" jdbcType="8"/>
+      <index name="i_product_id" unique="true" columns="product_id"/>
+      <index name="i_prod_brand_name" unique="false" columns="brand_name"/>
+      <index name="i_prod_class_id" unique="false" columns="product_class_id"/>
+      <index name="i_product_name" unique="false" columns="product_name"/>
+      <index name="i_product_SKU" unique="false" columns="SKU"/>
+    </table>
+    <table name="product_class" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_class_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="product_subcategory" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="product_category" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="product_department" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="product_family" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+    </table>
+    <table name="promotion" schema="" catalog="mondrian" type="TABLE">
+      <column name="promotion_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="promotion_district_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="promotion_name" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="media_type" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="cost" sqlType="DECIMAL" precision="10" scale="4" nullable="true" jdbcType="3"/>
+      <column name="start_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="end_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <index name="i_promotion_id" unique="true" columns="promotion_id"/>
+      <index name="i_promo_dist_id" unique="false" columns="promotion_district_id"/>
+    </table>
+    <table name="region" schema="" catalog="mondrian" type="TABLE">
+      <column name="region_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="sales_city" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="sales_state_province" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="sales_district" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="sales_region" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="sales_country" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="sales_district_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+    </table>
+    <table name="reserve_employee" schema="" catalog="mondrian" type="TABLE">
+      <column name="employee_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="full_name" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="first_name" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="last_name" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="position_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="position_title" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="department_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="birth_date" sqlType="DATETIME" precision="19" scale="0" nullable="false" jdbcType="93"/>
+      <column name="hire_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="end_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="salary" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="supervisor_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="education_level" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="marital_status" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <column name="gender" sqlType="VARCHAR" precision="30" scale="0" nullable="false" jdbcType="12"/>
+      <index name="i_rsrv_empl_id" unique="true" columns="employee_id"/>
+      <index name="i_rsrv_empl_dept" unique="false" columns="department_id"/>
+      <index name="i_rsrv_empl_store" unique="false" columns="store_id"/>
+      <index name="i_rsrv_empl_sup" unique="false" columns="supervisor_id"/>
+    </table>
+    <table name="salary" schema="" catalog="mondrian" type="TABLE">
+      <column name="pay_date" sqlType="DATETIME" precision="19" scale="0" nullable="false" jdbcType="93"/>
+      <column name="employee_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="department_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="currency_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="salary_paid" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="overtime_paid" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="vacation_accrued" sqlType="DOUBLE" precision="22" scale="0" nullable="false" jdbcType="8"/>
+      <column name="vacation_used" sqlType="DOUBLE" precision="22" scale="0" nullable="false" jdbcType="8"/>
+      <index name="i_salary_employee" unique="false" columns="employee_id"/>
+      <index name="i_salary_pay_date" unique="false" columns="pay_date"/>
+    </table>
+    <table name="sales_fact_1997" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="promotion_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <index name="i_sls_97_cust_id" unique="false" columns="customer_id"/>
+      <index name="i_sls_97_prod_id" unique="false" columns="product_id"/>
+      <index name="i_sls_97_promo_id" unique="false" columns="promotion_id"/>
+      <index name="i_sls_97_store_id" unique="false" columns="store_id"/>
+      <index name="i_sls_97_time_id" unique="false" columns="time_id"/>
+    </table>
+    <table name="sales_fact_1998" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="promotion_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <index name="i_sls_1998_prod_id" unique="false" columns="product_id"/>
+      <index name="i_sls_1998_promo" unique="false" columns="promotion_id"/>
+      <index name="i_sls_1998_store" unique="false" columns="store_id"/>
+      <index name="i_sls_1998_time_id" unique="false" columns="time_id"/>
+      <index name="i_sls_98_cust_id" unique="false" columns="customer_id"/>
+    </table>
+    <table name="sales_fact_dec_1998" schema="" catalog="mondrian" type="TABLE">
+      <column name="product_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="customer_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="promotion_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="store_cost" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <column name="unit_sales" sqlType="DECIMAL" precision="10" scale="4" nullable="false" jdbcType="3"/>
+      <index name="i_sls_dec98_cust" unique="false" columns="customer_id"/>
+      <index name="i_sls_dec98_prod" unique="false" columns="product_id"/>
+      <index name="i_sls_dec98_promo" unique="false" columns="promotion_id"/>
+      <index name="i_sls_dec98_store" unique="false" columns="store_id"/>
+      <index name="i_sls_dec98_time" unique="false" columns="time_id"/>
+    </table>
+    <table name="store" schema="" catalog="mondrian" type="TABLE">
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_type" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="region_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="store_name" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_number" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="store_street_address" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_city" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_state" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_postal_code" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_country" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_manager" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_phone" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_fax" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="first_opened_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="last_remodel_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="store_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="grocery_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="frozen_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="meat_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="coffee_bar" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="video_store" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="salad_bar" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="prepared_food" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="florist" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <index name="i_store_id" unique="true" columns="store_id"/>
+      <index name="i_store_region_id" unique="false" columns="region_id"/>
+    </table>
+    <table name="store_ragged" schema="" catalog="mondrian" type="TABLE">
+      <column name="store_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="store_type" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="region_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="store_name" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_number" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="store_street_address" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_city" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_state" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_postal_code" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_country" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_manager" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_phone" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="store_fax" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="first_opened_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="last_remodel_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="store_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="grocery_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="frozen_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="meat_sqft" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="coffee_bar" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="video_store" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="salad_bar" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="prepared_food" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <column name="florist" sqlType="TINYINT" precision="3" scale="0" nullable="true" jdbcType="-6"/>
+      <index name="i_store_raggd_id" unique="true" columns="store_id"/>
+      <index name="i_store_rggd_reg" unique="false" columns="region_id"/>
+    </table>
+    <table name="time_by_day" schema="" catalog="mondrian" type="TABLE">
+      <column name="time_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="the_date" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="the_day" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="the_month" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="the_year" sqlType="SMALLINT" precision="5" scale="0" nullable="true" jdbcType="5"/>
+      <column name="day_of_month" sqlType="SMALLINT" precision="5" scale="0" nullable="true" jdbcType="5"/>
+      <column name="week_of_year" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="month_of_year" sqlType="SMALLINT" precision="5" scale="0" nullable="true" jdbcType="5"/>
+      <column name="quarter" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="fiscal_period" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <index name="i_time_day" unique="true" columns="the_date"/>
+      <index name="i_time_id" unique="true" columns="time_id"/>
+      <index name="i_time_month" unique="false" columns="month_of_year"/>
+      <index name="i_time_quarter" unique="false" columns="quarter"/>
+      <index name="i_time_year" unique="false" columns="the_year"/>
+    </table>
+    <table name="warehouse" schema="" catalog="mondrian" type="TABLE">
+      <column name="warehouse_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="warehouse_class_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="stores_id" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="warehouse_name" sqlType="VARCHAR" precision="60" scale="0" nullable="true" jdbcType="12"/>
+      <column name="wa_address1" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="wa_address2" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="wa_address3" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="wa_address4" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="warehouse_city" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="warehouse_state_province" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="warehouse_postal_code" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="warehouse_country" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="warehouse_owner_name" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="warehouse_phone" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+      <column name="warehouse_fax" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+    </table>
+    <table name="warehouse_class" schema="" catalog="mondrian" type="TABLE">
+      <column name="warehouse_class_id" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="description" sqlType="VARCHAR" precision="30" scale="0" nullable="true" jdbcType="12"/>
+    </table>
+  </data-source>
+</component>

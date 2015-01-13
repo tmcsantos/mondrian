@@ -378,9 +378,12 @@ public class RolapResult extends ResultBase {
                         }
                     }
 
-                    Member placeholder = setPlaceholderSlicerAxis(
-                        (RolapMember)tupleList.get(0).get(0), calc, true);
-                    evaluator.setContext(placeholder);
+                    if (tupleList.get(0).size() > 0) {
+                        Member placeholder = setPlaceholderSlicerAxis(
+                            (RolapMember)tupleList.get(0).get(0), calc, true);
+
+                        evaluator.setContext(placeholder);
+                    }
                 }
             } while (phase());
 
@@ -509,7 +512,7 @@ public class RolapResult extends ResultBase {
 
             // If you are very close to running out of memory due to
             // the number of CellInfo's in cellInfos, then calling this
-            // may cause the out of memory one is trying to aviod.
+            // may cause the out of memory one is trying to avoid.
             // On the other hand, calling this can reduce the size of
             // the ObjectPool's internal storage by half (but, of course,
             // it will not reduce the size of the stored objects themselves).
@@ -640,7 +643,7 @@ public class RolapResult extends ResultBase {
             }
         }
         int toRemove = 0;
-        for (int i = 0; i < unary.length; i++) {
+        for (int i = 0; i < (unary != null ? unary.length : 0); i++) {
             if (unary[i]) {
                 evaluator.setContext(first.get(i));
                 toRemove++;
@@ -649,20 +652,17 @@ public class RolapResult extends ResultBase {
 
         // remove the unnecessary members from the compound slicer
         if (toRemove > 0) {
-          TupleList newList =
-              new ListTupleList(
-                  tupleList.getArity() - toRemove,
-                  new ArrayList<Member>());
-          for (List<Member> tuple : tupleList) {
-              List<Member> ntuple = new ArrayList<Member>();
-              for (int i = 0; i < tuple.size(); i++) {
-                  if (!unary[i]) {
-                      ntuple.add(tuple.get(i));
-                  }
-              }
-              newList.add(ntuple);
-          }
-          tupleList = newList;
+            TupleList newList = TupleCollections.createList(tupleList.getArity() - toRemove);
+            for (List<Member> tuple : tupleList) {
+                List<Member> ntuple = new ArrayList<Member>();
+                for (int i = 0; i < tuple.size(); i++) {
+                    if (!unary[i]) {
+                        ntuple.add(tuple.get(i));
+                    }
+                }
+                newList.add(ntuple);
+            }
+            tupleList = newList;
         }
         return tupleList;
     }

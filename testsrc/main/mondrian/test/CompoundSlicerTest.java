@@ -494,9 +494,9 @@ public class CompoundSlicerTest extends FoodMartTestCase {
                   + "{[Gender].[All Gender]}\n"
                   + "{[Gender].[F]}\n"
                   + "{[Gender].[M]}\n"
-                  + "Row #0: 241,134, 241,134, 241,134\n"
-                  + "Row #1: 119,218, 119,218, 119,218\n"
-                  + "Row #2: 121,916, 121,916, 121,916\n"
+                  + "Row #0: 216,537\n"
+                  + "Row #1: 107,016\n"
+                  + "Row #2: 109,521\n"
                 : "Axis #0:\n"
                   + "{[Product].[Drink]}\n"
                   + "{[Product].[Food]}\n"
@@ -616,6 +616,24 @@ public class CompoundSlicerTest extends FoodMartTestCase {
             + "Row #0: 39,165\n"
             + "Row #1: 19,532\n"
             + "Row #2: 19,633\n");
+
+        assertQueryReturns(
+            "select [Measures].[Unit Sales] on 0,\n"
+                + "[Gender].Members on 1\n"
+                + "from [Sales]\n"
+                + "where {[Product].[Drink],[Product].[Drink]}",
+            "Axis #0:\n"
+                + "{[Product].[Drink]}\n"
+                + "{[Product].[Drink]}\n"
+                + "Axis #1:\n"
+                + "{[Measures].[Unit Sales]}\n"
+                + "Axis #2:\n"
+                + "{[Gender].[All Gender]}\n"
+                + "{[Gender].[F]}\n"
+                + "{[Gender].[M]}\n"
+                + "Row #0: 24,597\n"
+                + "Row #1: 12,202\n"
+                + "Row #2: 12,395\n");
     }
 
     /**
@@ -1255,11 +1273,11 @@ public class CompoundSlicerTest extends FoodMartTestCase {
         // calculated measure in slicer
         testContext.assertQueryReturns(
             " SELECT FROM SALES WHERE "
-                + "[Measures].[Profit] * { [Store].[USA].[CA], [Store].[USA].[OR]}",
+            + "[Measures].[Profit] * { [Store].[USA].[CA], [Store].[USA].[OR]}",
             "Axis #0:\n"
-                + "{[Measures].[Profit], [Store].[USA].[CA]}\n"
-                + "{[Measures].[Profit], [Store].[USA].[OR]}\n"
-                + "$181,141.98");
+            + "{[Measures].[Profit], [Store].[USA].[CA]}\n"
+            + "{[Measures].[Profit], [Store].[USA].[OR]}\n"
+            + "$181,141.98");
     }
 
     public void testUnsatisfiableSlicerBug() throws Exception {

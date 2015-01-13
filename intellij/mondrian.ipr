@@ -852,6 +852,8 @@
         <root url="jar:///usr/local/mysql-connector-java-3.1.12/mysql-connector-java-3.1.12-bin.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/derby.jar!/" />
         <root url="jar://$PROJECT_DIR$/../testlib/ojdbc14.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../dev-lib/mysql-connector.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../dev-lib/postgresql-jdbc.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
