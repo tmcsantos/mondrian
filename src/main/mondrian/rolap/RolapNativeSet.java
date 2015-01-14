@@ -11,23 +11,23 @@
 */
 package mondrian.rolap;
 
-import mondrian.calc.ResultStyle;
-import mondrian.calc.TupleList;
-import mondrian.calc.impl.*;
+import mondrian.calc.*;
+import mondrian.calc.impl.DelegatingTupleList;
 import mondrian.olap.*;
 import mondrian.rolap.TupleReader.MemberBuilder;
 import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.cache.*;
 import mondrian.rolap.sql.*;
 
-import org.apache.commons.collections.*;
+import org.apache.commons.collections.Predicate;
 import org.apache.log4j.Logger;
-
-import java.util.*;
 
 import javax.sql.DataSource;
 
-import static org.apache.commons.collections.CollectionUtils.*;
+import java.util.*;
+
+import static org.apache.commons.collections.CollectionUtils.exists;
+import static org.apache.commons.collections.CollectionUtils.filter;
 
 /**
  * Analyses set expressions and executes them in SQL if possible.
@@ -178,7 +178,9 @@ public abstract class RolapNativeSet extends RolapNative {
             switch (desiredResultStyle) {
             case ITERABLE:
                 for (CrossJoinArg arg : this.args) {
-                    if (arg.getLevel().getDimension().isHighCardinality()) {
+                    if (arg.getLevel() != null
+                        && arg.getLevel().getDimension().isHighCardinality())
+                    {
                         // If any of the dimensions is a HCD,
                         // use the proper tuple reader.
                         return executeList(

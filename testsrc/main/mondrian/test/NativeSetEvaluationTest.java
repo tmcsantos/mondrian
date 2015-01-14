@@ -1522,5 +1522,21 @@ public class NativeSetEvaluationTest extends BatchTestCase {
             + "Row #0: 12,334\n");
     }
 
+    /**
+     * Test case for <a href="http://jira.pentaho.com/browse/MONDRIAN-1964">
+     * Bug MONDRIAN-1964,
+     * "An empty set in a crossjoin arg when ExpandNonNative=true
+     * causes a NPE"</a>.
+     */
+    public void testBugMondrian1964() {
+        //MondrianProperties.instance().ExpandNonNative.set(true);
+        assertQueryReturns(
+            "select NON EMPTY Crossjoin({}, [Gender].[Gender].Members) ON COLUMNS\n"
+            + "from [Sales]",
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n");
+    }
+
 }
 // End NativeSetEvaluationTest.java
