@@ -869,6 +869,15 @@
         <root url="jar://$PROJECT_DIR$/../lib/junit-source.jar!/" />
       </SOURCES>
     </library>
+    <library name="mockito-all">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/mockito-all.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/../lib/mockito-all.jar!/" />
+      </SOURCES>
+    </library>
     <library name="olap4j">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/olap4j.jar!/" />

@@ -16,5 +16,6 @@
     <orderEntry type="library" name="olap4j" level="project" />
     <orderEntry type="library" name="olap4j-tck" level="project" />
     <orderEntry type="library" name="olap4j-xmla" level="project" />
+    <orderEntry type="library" name="mockito-all" level="project" />
   </component>
 </module>
