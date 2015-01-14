@@ -5,10 +5,9 @@
 // You must accept the terms of that agreement to use this software.
 //
 // Copyright (C) 2005-2005 Julian Hyde
-// Copyright (C) 2005-2012 Pentaho
+// Copyright (C) 2005-2015 Pentaho and others
 // All Rights Reserved.
 */
-
 package mondrian.test;
 
 import mondrian.olap.*;
@@ -1418,6 +1417,18 @@ public class UdfTest extends FoodMartTestCase {
         } finally {
             MDC.remove(MDC_KEY);
         }
+    }
+
+    public void testCellBatchSizeWithUdf() {
+        propSaver.set(MondrianProperties.instance().CellBatchSize, 4);
+        assertQueryReturns(
+            "select lastnonempty([education level].members, measures.[unit sales]) on 0 "
+                + "from sales",
+            "Axis #0:\n"
+                + "{}\n"
+                + "Axis #1:\n"
+                + "{[Education Level].[Partial High School]}\n"
+                + "Row #0: 79,155\n");
     }
 
     // ~ Inner classes --------------------------------------------------------
