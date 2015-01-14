@@ -1,20 +1,18 @@
 /*
-* This software is subject to the terms of the Eclipse Public License v1.0
-* Agreement, available at the following URL:
-* http://www.eclipse.org/legal/epl-v10.html.
-* You must accept the terms of that agreement to use this software.
-*
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+// This software is subject to the terms of the Eclipse Public License v1.0
+// Agreement, available at the following URL:
+// http://www.eclipse.org/legal/epl-v10.html.
+// You must accept the terms of that agreement to use this software.
+//
+// Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
 */
-
 package mondrian.olap.fun;
 
 import mondrian.calc.Calc;
 import mondrian.calc.ExpCompiler;
 import mondrian.calc.impl.AbstractBooleanCalc;
 import mondrian.mdx.ResolvedFunCall;
-import mondrian.olap.Evaluator;
-import mondrian.olap.FunDef;
+import mondrian.olap.*;
 
 /**
  * Definition of the <code>IsEmpty</code> MDX function.
@@ -48,7 +46,7 @@ class IsEmptyFunDef extends FunDefBase {
         return new AbstractBooleanCalc(call, new Calc[] {calc}) {
             public boolean evaluateBoolean(Evaluator evaluator) {
                 Object o = calc.evaluate(evaluator);
-                return o == null;
+                return Util.isNull(o);
             }
         };
     }

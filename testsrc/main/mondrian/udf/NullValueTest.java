@@ -49,13 +49,13 @@ public class NullValueTest extends FoodMartTestCase {
         // I believe that these IsEmpty results are correct.
         // The NullValue function does not represent a cell.
         s = executeExpr(" IsEmpty(NullValue()) ");
-        assertEquals("false", s);
+        assertEquals("true", s);
 
         // NullValue()/NullValue() evaluates to DoubleNull
         // but DoubleNull evaluates to null, so this seems
         // to be broken??
-        // s = executeExpr(" IsEmpty(NullValue()/NullValue()) ");
-        // assertEquals("false", s);
+        s = executeExpr(" IsEmpty(NullValue()/NullValue()) ");
+        assertEquals("true", s);
 
         s = executeExpr(" 4 + NullValue() ");
         assertEquals("4", s);
