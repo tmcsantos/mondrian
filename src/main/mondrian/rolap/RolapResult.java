@@ -652,7 +652,8 @@ public class RolapResult extends ResultBase {
 
         // remove the unnecessary members from the compound slicer
         if (toRemove > 0) {
-            TupleList newList = TupleCollections.createList(tupleList.getArity() - toRemove);
+            TupleList newList = TupleCollections.createList(
+                tupleList.getArity() - toRemove);
             for (List<Member> tuple : tupleList) {
                 List<Member> ntuple = new ArrayList<Member>();
                 for (int i = 0; i < tuple.size(); i++) {

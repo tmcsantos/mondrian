@@ -1423,12 +1423,12 @@ public class UdfTest extends FoodMartTestCase {
         propSaver.set(MondrianProperties.instance().CellBatchSize, 4);
         assertQueryReturns(
             "select lastnonempty([education level].members, measures.[unit sales]) on 0 "
-                + "from sales",
+            + "from sales",
             "Axis #0:\n"
-                + "{}\n"
-                + "Axis #1:\n"
-                + "{[Education Level].[Partial High School]}\n"
-                + "Row #0: 79,155\n");
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Education Level].[Partial High School]}\n"
+            + "Row #0: 79,155\n");
     }
 
     // ~ Inner classes --------------------------------------------------------
