@@ -1529,7 +1529,7 @@ public class NativeSetEvaluationTest extends BatchTestCase {
      * causes a NPE"</a>.
      */
     public void testBugMondrian1964() {
-        //MondrianProperties.instance().ExpandNonNative.set(true);
+        propSaver.set(MondrianProperties.instance().ExpandNonNative, true);
         assertQueryReturns(
             "select NON EMPTY Crossjoin({}, [Gender].[Gender].Members) ON COLUMNS\n"
             + "from [Sales]",

@@ -821,6 +821,7 @@
         <root url="jar://$PROJECT_DIR$/../lib/jlfgr.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/servlet-api.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/commons-io.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/commons-lang.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="jar://$PROJECT_DIR$/../lib/commons-math-javadoc.jar!/" />
@@ -846,6 +847,13 @@
       <SOURCES>
         <root url="file://$PROJECT_DIR$/../../farrago/src" />
       </SOURCES>
+    </library>
+    <library name="groovy-all">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/groovy-all.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="jdbcDrivers">
       <CLASSES>

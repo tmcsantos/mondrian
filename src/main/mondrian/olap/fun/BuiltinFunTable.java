@@ -2081,6 +2081,8 @@ public class BuiltinFunTable extends FunTableImpl {
         for (FunDef funDef : JavaFunDef.scan(Excel.class)) {
             builder.define(funDef);
         }
+
+        builder.define(DateDiffFunDef.Resolver);
     }
 
     /**

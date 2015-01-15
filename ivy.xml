@@ -38,10 +38,11 @@
     </configurations>
 
     <dependencies defaultconf="default->default">
+        <dependency org="org.codehaus.groovy" name="groovy-all" rev="${dependency.groovy-all.revision}"/>
         <dependency org="commons-collections" name="commons-collections"
                 rev="3.2"/>
         <dependency org="commons-dbcp" name="commons-dbcp" rev="1.2.1"/>
-        <dependency org="commons-lang" name="commons-lang" rev="2.4"/>
+        <dependency org="commons-lang" name="commons-lang" rev="2.6"/>
         <dependency org="commons-io" name="commons-io" rev="1.4"/>
         <dependency org="commons-logging" name="commons-logging" rev="1.1.1"/>
         <dependency org="commons-math" name="commons-math" rev="1.1"/>

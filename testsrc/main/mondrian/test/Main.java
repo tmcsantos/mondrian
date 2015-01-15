@@ -281,6 +281,7 @@ public class Main extends TestSuite {
             addTest(suite, CompatibilityTest.class);
             addTest(suite, CaptionTest.class);
             addTest(suite, UdfTest.class);
+            addTest(suite, DateDiffTest.class);
             addTest(suite, NullValueTest.class);
             addTest(suite, NamedSetTest.class);
             addTest(suite, NativeSetEvaluationTest.class);

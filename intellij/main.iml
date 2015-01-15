@@ -14,5 +14,6 @@
     <orderEntry type="library" name="jdbcDrivers" level="project" />
     <orderEntry type="library" name="pentaho" level="project" />
     <orderEntry type="library" name="olap4j" level="project" />
+    <orderEntry type="library" name="groovy-all" level="project" />
   </component>
 </module>
