@@ -227,6 +227,9 @@ class FilterFunDef extends FunDefBase {
                         final TupleCursor cursor = iterable.tupleCursor();
 
                         public boolean forward() {
+                            if (Locus.isEmpty()) {
+                                return false;
+                            }
                             while (cursor.forward()) {
                                 Locus.peek().execution.checkCancelOrTimeout();
                                 cursor.setContext(evaluator2);
