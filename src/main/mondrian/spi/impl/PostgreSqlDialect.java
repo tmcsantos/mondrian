@@ -121,6 +121,11 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
         return super.getType(metaData, columnIndex);
     }
 
+    @Override
+    public boolean allowsCountDistinct() {
+        return false;
+    }
+
 }
 
 // End PostgreSqlDialect.java
