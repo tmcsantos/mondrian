@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.*;
 
 /**
  * Implementation of {@link mondrian.spi.Dialect} for the Vertica database.
@@ -129,6 +130,30 @@ public class VerticaDialect extends JdbcDialectImpl {
     public boolean supportsMultiValueInExpr() {
         return true;
     }
+
+    @Override
+    public boolean allowsRegularExpressionInWhereClause() {
+        return true;
+    }
+
+    public String generateRegularExpression(String source, String javaRegex) {
+        try {
+            Pattern.compile(javaRegex);
+        } catch (PatternSyntaxException e) {
+            // Not a valid Java regex. Too risky to continue.
+            return null;
+        }
+        javaRegex = javaRegex.replace("\\Q", "");
+        javaRegex = javaRegex.replace("\\E", "");
+        final StringBuilder sb = new StringBuilder();
+        sb.append("REGEXP_LIKE(CAST(");
+        sb.append(source);
+        sb.append(" AS VARCHAR), ");
+        quoteStringLiteral(sb, javaRegex);
+        sb.append(")");
+        return sb.toString();
+    }
+
 }
 
 // End VerticaDialect.java
