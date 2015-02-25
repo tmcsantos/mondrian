@@ -695,41 +695,32 @@ public class SegmentBuilder {
     }
 
     public static List<SegmentColumn> toConstrainedColumns(
-        StarColumnPredicate[] predicates)
-    {
-        return toConstrainedColumns(
-            Arrays.asList(predicates));
-    }
-
-    public static List<SegmentColumn> toConstrainedColumns(
-        Collection<StarColumnPredicate> predicates)
+        StarColumnPredicate[] predicates,
+        RolapStar.Column[] baseColumns)
     {
         List<SegmentColumn> ccs =
             new ArrayList<SegmentColumn>();
-        for (StarColumnPredicate predicate : predicates) {
+        for (int i = 0; i < predicates.length; i++) {
+            StarColumnPredicate predicate = predicates[i];
             final List<Comparable> values =
                 new ArrayList<Comparable>();
             predicate.values(Util.cast(values));
             final Comparable[] valuesArray =
                 values.toArray(new Comparable[values.size()]);
+            final ArraySortedSet<Comparable> valueList;
             if (valuesArray.length == 1 && valuesArray[0].equals(true)) {
-                ccs.add(
-                    new SegmentColumn(
-                        predicate.getConstrainedColumn()
-                            .getExpression().getGenericExpression(),
-                        predicate.getConstrainedColumn().getCardinality(),
-                        null));
+                valueList = null;
             } else {
                 Arrays.sort(
                     valuesArray,
                     Util.SqlNullSafeComparator.instance);
-                ccs.add(
-                    new SegmentColumn(
-                        predicate.getConstrainedColumn()
-                            .getExpression().getGenericExpression(),
-                        predicate.getConstrainedColumn().getCardinality(),
-                        new ArraySortedSet(valuesArray)));
+                valueList = new ArraySortedSet<Comparable>(valuesArray);
             }
+            ccs.add(
+                new SegmentColumn(
+                    baseColumns[i].getExpression().getGenericExpression(),
+                    predicate.getConstrainedColumn().getCardinality(),
+                    valueList));
         }
         return ccs;
     }
@@ -742,9 +733,12 @@ public class SegmentBuilder {
      * a SegmentHeader.
      * @return A SegmentHeader describing the supplied Segment object.
      */
-    public static SegmentHeader toHeader(Segment segment) {
+    public static SegmentHeader toHeader(
+        Segment segment)
+    {
         final List<SegmentColumn> cc =
-            SegmentBuilder.toConstrainedColumns(segment.predicates);
+            SegmentBuilder.toConstrainedColumns(
+                segment.predicates, segment.columns);
         final List<String> cp = new ArrayList<String>();
 
         StringBuilder buf = new StringBuilder();

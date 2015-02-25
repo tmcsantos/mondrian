@@ -4,7 +4,7 @@
 // http://www.eclipse.org/legal/epl-v10.html.
 // You must accept the terms of that agreement to use this software.
 //
-// Copyright (c) 2002-2014 Pentaho Corporation.
+// Copyright (c) 2002-2015 Pentaho Corporation.
 // All Rights Reserved.
 */
 package mondrian.rolap.cache;
@@ -24,10 +24,8 @@ import java.io.PrintWriter;
 import java.sql.Statement;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
-
 
 /**
  * Data structure that identifies which segments contain cells.
@@ -186,12 +184,10 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
 
         HeaderInfo headerInfo = headerMap.get(header);
         if (headerInfo == null) {
-            headerInfo = new HeaderInfo();
-            if (loading) {
-                // We are currently loading this segment. It isnt' in cache.
-                // We put a slot into which the data will become available.
-                headerInfo.slot = new SlotFuture<SegmentBody>();
-            }
+            headerInfo = new HeaderInfo(
+                loading
+                    ? new SlotFuture<SegmentBody>()
+                    : null);
             headerMap.put(header, headerInfo);
         }
 
@@ -898,6 +894,13 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
                 final SegmentColumn column1 =
                     header.getConstrainedColumn(
                         column.columnExpression);
+                if (column1 == null) {
+                    // This has been known to occur when segments are populated
+                    // from aggregate tables.
+                    throw Util.newInternal(
+                        "Could not find column for " + column.columnExpression
+                        + " in segment header " + header);
+                }
                 if (column1.getValues() == null) {
                     // Wildcard. Mark all values as present.
                     for (Entry<Comparable, BitSet> entry : valueMap.entrySet())
@@ -1056,7 +1059,7 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
         /**
          * The future object to pass on to clients.
          */
-        private SlotFuture<SegmentBody> slot;
+        private final SlotFuture<SegmentBody> slot;
         /**
          * A list of clients interested in this segment.
          */
@@ -1068,6 +1071,10 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
          * when flushing.
          */
         private boolean removeAfterLoad;
+
+        HeaderInfo(SlotFuture<SegmentBody> slot) {
+            this.slot = slot;
+        }
     }
 }
 

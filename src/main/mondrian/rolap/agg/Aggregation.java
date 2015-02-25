@@ -159,7 +159,7 @@ public class Aggregation {
         for (RolapStar.Measure measure : measures) {
             measureBitKey.set(measure.getBitPosition());
             Segment segment =
-                new Segment(
+                Segment.create(
                     star,
                     constrainedColumnsBitKey,
                     columns,
@@ -178,9 +178,9 @@ public class Aggregation {
         Collections.sort(
             segments, new Comparator<Segment>() {
                 public int compare(Segment o1, Segment o2) {
-                    return Integer.valueOf(
-                        o1.measure.getBitPosition())
-                            .compareTo(o2.measure.getBitPosition());
+                    return Util.compare(
+                        o1.measure.getBitPosition(),
+                        o2.measure.getBitPosition());
                 }
             });
         return segments;
@@ -194,8 +194,11 @@ public class Aggregation {
         RolapStar.Column[] columns,
         StarColumnPredicate[] predicates)
     {
+        if (predicates.length == 0) {
+            return predicates;
+        }
         RolapStar star = getStar();
-        Util.assertTrue(predicates.length == columns.length);
+        assert predicates.length == columns.length;
         StarColumnPredicate[] newPredicates = predicates.clone();
         double[] bloats = new double[columns.length];
 

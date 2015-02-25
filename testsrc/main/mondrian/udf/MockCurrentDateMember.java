@@ -21,7 +21,7 @@ public class MockCurrentDateMember extends CurrentDateMemberExactUdf {
     @Override
     Date getDate(Evaluator evaluator, Argument[] arguments) {
         Calendar cal = Calendar.getInstance();
-        cal.set(1997, 1, 1);
+        cal.set(1997, Calendar.FEBRUARY, 1);
         return new Date(cal.getTimeInMillis());
     }
     @Override
