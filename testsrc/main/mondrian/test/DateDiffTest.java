@@ -105,7 +105,7 @@ public class DateDiffTest extends FoodMartTestCase {
             "DateDiff('day',"
             + "MockCurrentDateMember([Time].[Time], \"[yyyy]\"),"
             + " [Time].[1998].[Q1])");
-        assertEquals("365", s);
+        assertEquals("334", s);
     }
 
     public String executeExpr2(String expression){
