@@ -90,7 +90,7 @@ class DateDiffFunDef extends FunDefBase {
                     Date date =
                         ((DateTimeCalc) calc).evaluateDateTime(evaluator);
                     return DateUtils.toCalendar(
-                        DateUtils.truncate(date, Calendar.DATE));
+                        DateUtils.truncate(date, Calendar.DAY_OF_MONTH));
                 }
             },
             MemberType{
@@ -101,9 +101,10 @@ class DateDiffFunDef extends FunDefBase {
                     Calendar date =
                         DateUtils.truncate(
                             Calendar.getInstance(),
-                            Calendar.DATE);
+                            Calendar.DAY_OF_MONTH);
                     // set to first day
-                    date.set(Calendar.DATE, 1);
+                    date.set(Calendar.DAY_OF_MONTH, 1);
+                    date.set(Calendar.MONTH, Calendar.JANUARY);
 
                     final SchemaReader schemaReader =
                         member.getDimension().getSchema().getSchemaReader();
@@ -127,18 +128,18 @@ class DateDiffFunDef extends FunDefBase {
                                     Integer.parseInt(parent.getName(), 10));
                                 break;
                             case TimeQuarters:
-                                int month;
+                                int quarter;
                                 try {
-                                    month = Integer.parseInt(parent.getName());
+                                    quarter = Integer.parseInt(parent.getName());
                                 } catch (NumberFormatException ignore) {
                                     // not a numeric format
                                     // try CN where C = char, N = number
-                                    month = Integer.parseInt(
+                                    quarter = Integer.parseInt(
                                         parent.getName().substring(1), 10);
                                 }
                                 date.set(
                                     Calendar.MONTH,
-                                    3 * (month - 1));
+                                    3 * (quarter - 1));
                                 break;
                             case TimeMonths:
                                 date.set(
@@ -147,7 +148,7 @@ class DateDiffFunDef extends FunDefBase {
                                 break;
                             case TimeDays:
                                 date.set(
-                                    Calendar.DATE,
+                                    Calendar.DAY_OF_MONTH,
                                     Integer.parseInt(parent.getName(), 10));
                                 break;
                         }

@@ -103,7 +103,7 @@ public class DateDiffTest extends FoodMartTestCase {
 
         s = executeExpr2(
             "DateDiff('day',"
-            + "MockCurrentDateMember([Time].[Time], \"[yyyy]\"),"
+            + "MockCurrentDateMember([Time].[Time], \"[yyyy]\\.[\\Qq]\\.[m]\"),"
             + " [Time].[1998].[Q1])");
         assertEquals("334", s);
     }
