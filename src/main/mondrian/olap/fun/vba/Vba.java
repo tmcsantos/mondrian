@@ -380,17 +380,18 @@ public class Vba {
         return calendar.getTime();
     }
 
-    @FunctionName("DateDiff")
-    @Signature(
-        "DateDiff(interval, date1, date2[, firstdayofweek[, firstweekofyear]])")
-    @Description(
-        "Returns a Variant (Long) specifying the number of time intervals "
-        + "between two specified dates.")
-    public static long dateDiff(String interval, Date date1, Date date2) {
-        return _dateDiff(
-            interval, date1, date2, Calendar.SUNDAY,
-            FirstWeekOfYear.vbFirstJan1);
-    }
+//    Implemented on DateDiffFunDef
+//    @FunctionName("DateDiff")
+//    @Signature(
+//        "DateDiff(interval, date1, date2[, firstdayofweek[, firstweekofyear]])")
+//    @Description(
+//        "Returns a Variant (Long) specifying the number of time intervals "
+//        + "between two specified dates.")
+//    public static long dateDiff(String interval, Date date1, Date date2) {
+//        return _dateDiff(
+//            interval, date1, date2, Calendar.SUNDAY,
+//            FirstWeekOfYear.vbFirstJan1);
+//    }
 
     @FunctionName("DateDiff")
     @Signature(
