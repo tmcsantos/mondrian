@@ -26,6 +26,7 @@ import mondrian.rolap.sql.CrossJoinArgFactoryTest;
 import mondrian.rolap.sql.SelectNotInGroupByTest;
 import mondrian.rolap.sql.SqlQueryTest;
 import mondrian.server.FileRepositoryTest;
+import mondrian.spi.impl.SybaseDialectTest;
 import mondrian.test.build.CodeComplianceTest;
 import mondrian.test.clearview.*;
 import mondrian.test.comp.ResultComparatorTest;
@@ -272,6 +273,7 @@ public class Main extends TestSuite {
             addTest(suite, XmlaTests.class);
             addTest(suite, DynamicDatasourceXmlaServletTest.class);
             addTest(suite, XmlaTest.class, "suite");
+            addTest(suite, XmlaDimensionPropertiesTest.class);
             if (isRunOnce()) {
                 addTest(suite, TestCalculatedMembers.class);
             }
@@ -340,6 +342,7 @@ public class Main extends TestSuite {
             addTest(suite, XmlaExtraTest.class);
             addTest(suite, CrossJoinArgFactoryTest.class);
             addTest(suite, UnionFunDefTest.class);
+            addTest(suite, SybaseDialectTest.class);
 
             boolean testNonEmpty = isRunOnce();
             if (!MondrianProperties.instance().EnableNativeNonEmpty.get()) {
