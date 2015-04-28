@@ -102,6 +102,8 @@ public class RolapResult extends ResultBase {
                 : new CellInfoPool(query.axes.length);
 
         if (!execute) {
+            // Used by named sets in slicer
+            slicerEvaluator = evaluator.push();
             return;
         }
 
