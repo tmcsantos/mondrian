@@ -127,11 +127,6 @@ public class VerticaDialect extends JdbcDialectImpl {
     }
 
     @Override
-    public boolean supportsMultiValueInExpr() {
-        return true;
-    }
-
-    @Override
     public boolean allowsRegularExpressionInWhereClause() {
         return true;
     }
