@@ -173,7 +173,10 @@ public class ArraySortedSet<E extends Comparable>
     public ArraySortedSet<E> merge(
         ArraySortedSet<E> arrayToMerge)
     {
-        assert arrayToMerge != null;
+        if (arrayToMerge == null) {
+            assert false : "array to merge is null";
+            return this;
+        }
 
         // No need to merge when one array is empty.
         if (this.size() == 0) {

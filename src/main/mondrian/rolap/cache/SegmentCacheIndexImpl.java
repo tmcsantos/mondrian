@@ -265,8 +265,10 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
         checkThread();
 
         final HeaderInfo headerInfo = headerMap.get(header);
-        assert headerInfo != null
-            : "segment header " + header.getUniqueID() + " is missing";
+        if (headerInfo == null) {
+            LOGGER.trace("loadSucceeded: Missing header " + header);
+            return;
+        }
         if (!headerInfo.slot.isDone()) {
             headerInfo.slot.put(body);
         }
@@ -608,8 +610,8 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
             measureName,
             compoundPredicates);
         final FactInfo factInfo = factMap.get(factKey);
-        assert factInfo != null : "should have called 'add' first";
         if (factInfo == null) {
+            assert false : "should have called 'add' first";
             return;
         }
         factInfo.converter = converter;
