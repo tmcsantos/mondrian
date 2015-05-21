@@ -437,8 +437,8 @@ public class Execution {
      * @param statement The statement used by this execution.
      */
     public void registerStatement(Locus locus, java.sql.Statement statement) {
-        synchronized (sqlStateLock) {
-            synchronized (stateLock) {
+        synchronized (stateLock) {
+            synchronized (sqlStateLock) {
                 if (state == State.FRESH) {
                     start();
                 }
