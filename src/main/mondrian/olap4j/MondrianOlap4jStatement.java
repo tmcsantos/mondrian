@@ -16,7 +16,6 @@ import mondrian.server.*;
 import mondrian.util.Pair;
 
 import org.olap4j.*;
-import org.olap4j.layout.RectangularCellSetFormatter;
 import org.olap4j.mdx.*;
 
 import java.io.PrintWriter;
@@ -38,6 +37,7 @@ abstract class MondrianOlap4jStatement
 {
     final MondrianOlap4jConnection olap4jConnection;
     private boolean closed;
+    private boolean markCanceled;
 
     /**
      * Support for {@link #closeOnCompletion()} method.
@@ -57,6 +57,7 @@ abstract class MondrianOlap4jStatement
         assert olap4jConnection != null;
         this.olap4jConnection = olap4jConnection;
         this.closed = false;
+        this.markCanceled = false;
     }
 
     // implement Statement
@@ -187,6 +188,7 @@ abstract class MondrianOlap4jStatement
     }
 
     public synchronized void cancel() throws SQLException {
+        markCanceled = true;
         if (openCellSet != null) {
             openCellSet.cancel();
         }
@@ -347,6 +349,12 @@ abstract class MondrianOlap4jStatement
         return executeOlapQueryInternal(pair.left, pair.right);
     }
 
+    protected void checkCancel() throws QueryCanceledException {
+        if (markCanceled) {
+            throw new QueryCanceledException("Query canceled.");
+        }
+    }
+
     protected Pair<Query, MondrianOlap4jCellSetMetaData>
     parseQuery(final String mdx)
         throws OlapException
@@ -359,15 +367,18 @@ abstract class MondrianOlap4jStatement
                 new Locus.Action<Pair<Query, MondrianOlap4jCellSetMetaData>>() {
                     public Pair<Query, MondrianOlap4jCellSetMetaData> execute()
                     {
+                        checkCancel();
                         final Query query =
                             (Query) mondrianConnection.parseStatement(
                                 MondrianOlap4jStatement.this,
                                 mdx,
                                 null,
                                 false);
+                        checkCancel();
                         final MondrianOlap4jCellSetMetaData cellSetMetaData =
                             new MondrianOlap4jCellSetMetaData(
                                 MondrianOlap4jStatement.this, query);
+                        checkCancel();
                         return Pair.of(query, cellSetMetaData);
                     }
                 });
@@ -412,6 +423,7 @@ abstract class MondrianOlap4jStatement
         // Release the monitor before executing, to give another thread the
         // opportunity to call cancel.
         try {
+            checkCancel();
             openCellSet.execute();
         } catch (QueryCanceledException e) {
             throw olap4jConnection.helper.createException(

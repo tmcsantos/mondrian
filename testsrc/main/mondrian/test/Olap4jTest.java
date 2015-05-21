@@ -655,6 +655,57 @@ public class Olap4jTest extends FoodMartTestCase {
         assertEquals(1, n);
         assertEquals(1, n2);
     }
+
+    public void testCancelExecution() {
+        final CountDownLatch startSignal = new CountDownLatch(1);
+        final TestContext tc = TestContext.instance().create(
+            null,
+            null,
+            null,
+            null,
+            "<UserDefinedFunction name=\"SleepUdf\" className=\""
+                + BasicQueryTest.SleepUdf.class.getName()
+                + "\"/>",
+            null);
+
+        try {
+            final OlapConnection connection = tc.getOlap4jConnection();
+            final OlapStatement stmt = connection.createStatement();
+
+            new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            startSignal.await();
+                            Thread.sleep(10);
+                            stmt.cancel();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            ).start();
+
+            String query =
+                "WITH \n"
+                + "  MEMBER [Measures].[Sleepy] \n"
+                + "    AS 'SleepUdf([Measures].[Unit Sales])' \n"
+                + "SELECT {[Measures].[Sleepy]} ON COLUMNS,\n"
+                + "  {[Product].members} ON ROWS\n"
+                + "FROM [Sales]";
+
+            query = tc.upgradeQuery(query);
+            startSignal.countDown();
+            stmt.executeOlapQuery(query);
+            fail("Query not aborted.");
+        } catch (OlapException e) {
+            TestContext.checkThrowable(e, "canceled");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
 
 // End Olap4jTest.java
