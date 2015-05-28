@@ -1,12 +1,12 @@
 /*
-* This software is subject to the terms of the Eclipse Public License v1.0
-* Agreement, available at the following URL:
-* http://www.eclipse.org/legal/epl-v10.html.
-* You must accept the terms of that agreement to use this software.
-*
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+// This software is subject to the terms of the Eclipse Public License v1.0
+// Agreement, available at the following URL:
+// http://www.eclipse.org/legal/epl-v10.html.
+// You must accept the terms of that agreement to use this software.
+//
+// Copyright (C) 2002-2015 Pentaho and others
+// All Rights Reserved.
 */
-
 package mondrian.util;
 
 import junit.framework.TestCase;
@@ -118,6 +118,31 @@ public class ConcatenableListTest extends TestCase {
         assertEquals(
             "testList.get(0) should return NON_EMPTY_MARKER", NON_EMPTY_MARKER,
             testList.get(0));
+    }
+
+    public void testGetWithMultipleLists() {
+        List<String> testList = new ConcatenableList<String>();
+
+        testList.addAll(Arrays.asList(NON_EMPTY_MARKER));
+        testList.addAll(Arrays.asList(VALUE_1, VALUE_2, VALUE_3));
+        testList.addAll(new ArrayList<String>());
+        testList.addAll(Arrays.asList(VALUE_4));
+        testList.addAll(Arrays.asList(VALUE_5, VALUE_6));
+
+        assertFalse(
+            "ConcatenableList testList should not be empty",
+            testList.isEmpty());
+
+        assertEquals(
+            "testList.get(0) should return NON_EMPTY_MARKER", NON_EMPTY_MARKER,
+            testList.get(0));
+
+        assertEquals("testList.get(6) should be A", VALUE_6, testList.get(6));
+        assertEquals("testList.get(1) should be A", VALUE_1, testList.get(1));
+        assertEquals("testList.get(4) should be A", VALUE_4, testList.get(4));
+        assertEquals("testList.get(2) should be A", VALUE_2, testList.get(2));
+        assertEquals("testList.get(3) should be A", VALUE_3, testList.get(3));
+        assertEquals("testList.get(5) should be A", VALUE_5, testList.get(5));
     }
 }
 

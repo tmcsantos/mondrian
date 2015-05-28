@@ -1,12 +1,12 @@
 /*
-* This software is subject to the terms of the Eclipse Public License v1.0
-* Agreement, available at the following URL:
-* http://www.eclipse.org/legal/epl-v10.html.
-* You must accept the terms of that agreement to use this software.
-*
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+// This software is subject to the terms of the Eclipse Public License v1.0
+// Agreement, available at the following URL:
+// http://www.eclipse.org/legal/epl-v10.html.
+// You must accept the terms of that agreement to use this software.
+//
+// Copyright (C) 2002-2015 Pentaho and others
+// All Rights Reserved.
 */
-
 package mondrian.util;
 
 import java.util.*;
@@ -23,14 +23,14 @@ public class ConcatenableList<T> extends AbstractList<T> {
     // The backing collection of sublists
     private final List<List<T>> lists;
 
+    // The backing hashset for constant time performance
+    private final Set<T> hash;
+    private int[] indexesTo;
+
     // List containing all elements from backing lists, populated only after
     // consolidate()
     private List<T> plainList;
     private final int hashCode = nextHashCode++;
-    private Iterator<T> getIterator = null;
-    private int previousIndex = -200;
-    private T previousElement = null;
-    private T prePreviousElement = null;
 
     /**
      * Creates an empty ConcatenableList.
@@ -38,6 +38,7 @@ public class ConcatenableList<T> extends AbstractList<T> {
     public ConcatenableList() {
         this.lists = new ArrayList<List<T>>();
         this.plainList = null;
+        this.hash = new HashSet<T>();
     }
 
     public <T2> T2[] toArray(T2[] a) {
@@ -59,87 +60,64 @@ public class ConcatenableList<T> extends AbstractList<T> {
         if (this.plainList == null) {
             this.plainList = new ArrayList<T>();
             for (final List<T> list : lists) {
-                // REVIEW: List.addAll is probably more efficient.
-                for (final T t : list) {
-                    this.plainList.add(t);
-                }
+                this.plainList.addAll(list);
             }
         }
     }
 
     public boolean addAll(final Collection<? extends T> collection) {
+        hash.addAll(collection);
         if (this.plainList == null) {
             final List<T> list = (List<T>) collection;
+            addToIndexes(list.size());
             return this.lists.add(list);
         } else {
-            for (final T e : collection) {
-                this.plainList.add(e);
-            }
-            return true;
+            return this.plainList.addAll(collection);
         }
+    }
+
+    private void addToIndexes(int size) {
+        if (indexesTo == null) {
+            indexesTo = new int[1];
+            indexesTo[0] = size - 1;
+        } else {
+            final int i = indexesTo.length;
+            indexesTo = Arrays.copyOf(indexesTo, i + 1);
+            int previousSize = indexesTo[i - 1] + size;
+            indexesTo[i] = previousSize;
+        }
+    }
+
+    private int lookupIndex(final int index) {
+        int i = Arrays.binarySearch(indexesTo, index);
+        if (i < 0) {
+            return -i - 1;
+        }
+        // check for indexed miss if there is empty lists in lists
+        while (i != 0 && indexesTo[i] == indexesTo[i - 1]) {
+            --i;
+        }
+        return i;
     }
 
     public T get(final int index) {
         if (this.plainList == null) {
-            if (index == 0) {
-                this.getIterator = this.iterator();
-                this.previousIndex = index;
-                if (this.getIterator.hasNext()) {
-                    this.previousElement = this.getIterator.next();
-                    return this.previousElement;
-                } else {
-                    this.getIterator = null;
-                    this.previousIndex = -200;
-                    throw new IndexOutOfBoundsException(
-                        "Index " + index + " out of concatenable list range");
-                }
-            } else if (this.previousIndex + 1 == index
-                && this.getIterator != null)
-            {
-                this.previousIndex = index;
-                if (this.getIterator.hasNext()) {
-                    this.prePreviousElement = this.previousElement;
-                    this.previousElement = this.getIterator.next();
-                    return this.previousElement;
-                } else {
-                    this.getIterator = null;
-                    this.previousIndex = -200;
-                    throw new IndexOutOfBoundsException(
-                        "Index " + index + " out of concatenable list range");
-                }
-            } else if (this.previousIndex == index) {
-                return this.previousElement;
-            } else if (this.previousIndex - 1 == index) {
-                return this.prePreviousElement;
-            } else {
-                this.previousIndex = -200;
-                this.getIterator = null;
-                final Iterator<T> it = this.iterator();
-                if (!it.hasNext()) {
-                    throw new IndexOutOfBoundsException(
-                        "Index " + index + " out of concatenable list range");
-                }
-                for (int i = 0; i < index; i++) {
-                    if (!it.hasNext()) {
-                        throw new IndexOutOfBoundsException(
-                            "Index " + index
-                            + " out of concatenable list range");
-                    }
-                    this.prePreviousElement = it.next();
-                }
-                this.previousElement = it.next();
-                this.previousIndex = index;
-                this.getIterator = it;
-                return this.previousElement;
+            final int indexes = lookupIndex(index);
+            int newIndex = index;
+            if (indexes > 0) {
+                newIndex -= (indexesTo[indexes - 1] + 1);
             }
+            List<T> result = lists.get(indexes);
+            return result.get(newIndex);
         } else {
-            this.previousElement = this.plainList.get(index);
-            return this.previousElement;
+            return this.plainList.get(index);
         }
     }
 
     public boolean add(final T t) {
+        hash.add(t);
         if (this.plainList == null) {
+            addToIndexes(1);
             return this.lists.add(Collections.singletonList(t));
         } else {
             return this.plainList.add(t);
@@ -150,6 +128,7 @@ public class ConcatenableList<T> extends AbstractList<T> {
         if (this.plainList == null) {
             throw new UnsupportedOperationException();
         } else {
+            hash.add(t);
             this.plainList.add(index, t);
         }
     }
@@ -158,23 +137,13 @@ public class ConcatenableList<T> extends AbstractList<T> {
         if (this.plainList == null) {
             throw new UnsupportedOperationException();
         } else {
+            hash.add(t);
             return this.plainList.set(index, t);
         }
     }
 
     public int size() {
-        if (this.plainList == null) {
-            // REVIEW: Consider consolidating here. As it stands, this loop is
-            // expensive if called often on a lot of small lists. Amortized cost
-            // would be lower if we consolidated, or partially consolidated.
-            int size = 0;
-            for (final List<T> list : lists) {
-                size += list.size();
-            }
-            return size;
-        } else {
-            return this.plainList.size();
-        }
+        return hash.size();
     }
 
     public Iterator<T> iterator() {
@@ -225,24 +194,18 @@ public class ConcatenableList<T> extends AbstractList<T> {
     }
 
     public boolean isEmpty() {
-        if (this.plainList != null) {
-            return this.plainList.isEmpty();
-        }
-        if (this.lists.isEmpty()) {
-            return true;
-        } else {
-            for (final List<T> l : lists) {
-                if (!l.isEmpty()) {
-                    return false;
-                }
-            }
-            return true;
-        }
+        return hash.isEmpty();
+    }
+
+    public boolean contains(Object o) {
+        return hash.contains(o);
     }
 
     public void clear() {
         this.plainList = null;
         this.lists.clear();
+        this.hash.clear();
+        this.indexesTo = null;
     }
 
     public int hashCode() {
