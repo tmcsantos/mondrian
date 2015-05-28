@@ -22,6 +22,7 @@ import mondrian.olap4j.XmlaExtraTest;
 import mondrian.rolap.*;
 import mondrian.rolap.agg.*;
 import mondrian.rolap.aggmatcher.*;
+import mondrian.rolap.sql.CodeSetTest;
 import mondrian.rolap.sql.CrossJoinArgFactoryTest;
 import mondrian.rolap.sql.SelectNotInGroupByTest;
 import mondrian.rolap.sql.SqlQueryTest;
@@ -343,6 +344,7 @@ public class Main extends TestSuite {
             addTest(suite, CrossJoinArgFactoryTest.class);
             addTest(suite, UnionFunDefTest.class);
             addTest(suite, SybaseDialectTest.class);
+            addTest(suite, SqlStatementTest.class);
 
             boolean testNonEmpty = isRunOnce();
             if (!MondrianProperties.instance().EnableNativeNonEmpty.get()) {
@@ -361,6 +363,7 @@ public class Main extends TestSuite {
 
             addTest(suite, FastBatchingCellReaderTest.class);
             addTest(suite, SqlQueryTest.class);
+            addTest(suite, CodeSetTest.class);
 
             if (MondrianProperties.instance().EnableNativeCrossJoin.get()) {
                 addTest(suite, BatchedFillTest.class, "suite");
