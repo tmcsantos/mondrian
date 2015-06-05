@@ -47,6 +47,10 @@ public abstract class RolapNativeSet extends RolapNative {
     private SmartCache<Object, TupleList> cache =
         new SoftSmartCache<Object, TupleList>();
 
+    public SmartCache getCache(){
+        return cache;
+    }
+
     /**
      * Returns whether certain member types (e.g. calculated members) should
      * disable native SQL evaluation for expressions containing them.

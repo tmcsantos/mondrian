@@ -155,6 +155,11 @@ interface MemberCache {
         RolapLevel level,
         TupleConstraint constraint,
         List<RolapMember> children);
+
+    /**
+     * Flushes the cache
+     */
+    void flush();
 }
 
 

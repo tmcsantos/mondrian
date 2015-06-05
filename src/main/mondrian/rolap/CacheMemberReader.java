@@ -117,6 +117,10 @@ class CacheMemberReader implements MemberReader, MemberCache {
         throw new UnsupportedOperationException();
     }
 
+    public void flush() {
+        throw new UnsupportedOperationException();
+    }
+
     // this cache is immutable
     public boolean isMutable()
     {

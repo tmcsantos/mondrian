@@ -38,6 +38,7 @@ public class MemberNoCacheHelper extends MemberCacheHelper {
         return null;
     }
 
+    public void flush() { }
 
     // implement MemberCache
     public Object putMember(Object key, RolapMember value) {
