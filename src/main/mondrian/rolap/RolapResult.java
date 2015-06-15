@@ -210,6 +210,7 @@ public class RolapResult extends ResultBase {
             // The AxisMember object is used to hold Members that are found
             // during Step 1 when the Axes are determined.
             final AxisMemberList axisMembers = new AxisMemberList();
+            axisMembers.setExecution(execution);
 
 
             // list of ALL Members that are not default Members
@@ -1516,6 +1517,7 @@ public class RolapResult extends ResultBase {
         private int totalCellCount;
         private int axisCount;
         private boolean countOnly;
+        private Execution execution;
 
         AxisMemberList() {
             this.countOnly = false;
@@ -1525,6 +1527,10 @@ public class RolapResult extends ResultBase {
             // Now that the axes are evaluated, make sure that the number of
             // cells does not exceed the result limit.
             this.limit = MondrianProperties.instance().ResultLimit.get();
+        }
+
+        public void setExecution(Execution execution) {
+            this.execution = execution;
         }
 
         public Iterator<Member> iterator() {
@@ -1600,6 +1606,8 @@ public class RolapResult extends ResultBase {
         private void mergeMember(final Member member) {
             this.axisCount++;
             if (! countOnly) {
+                // make sure if execution is still valid.
+                execution.checkCancelOrTimeout();
                 if (isSlicer) {
                     if (! members.contains(member)) {
                         members.add(member);
