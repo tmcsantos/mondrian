@@ -131,6 +131,13 @@ public class DialectTest extends TestCase {
                 databaseMetaData.getDatabaseProductName()
                     .indexOf("PostgreSQL") >= 0);
             break;
+        case EXASOL:
+                // Dialect has identified that it is Exasol.
+                assertTrue(dialect instanceof ExasolDialect);
+                assertTrue(
+                    databaseMetaData.getDatabaseProductName()
+                        .contains("EXASolution"));
+                break;
         case MSSQL:
             // Dialect has identified that it is MSSQL.
             assertTrue(dialect instanceof MicrosoftSqlServerDialect);
@@ -201,7 +208,9 @@ public class DialectTest extends TestCase {
                 // SQL server 2008
                 "Incorrect syntax near ','.",
                 // NuoDB
-                "(?s).*expected closing parenthesis got ,.*"
+                "(?s).*expected closing parenthesis got ,.*",
+                //Exasol
+                "Function COUNT should not be called with 2 arguments. Possible number of arguments: 1 \\(Session: .+\\)"
             };
             assertQueryFails(sql, errs);
         }
@@ -485,6 +494,8 @@ public class DialectTest extends TestCase {
                 // Vertica 6
                 "(?s).*ERROR: ORDER BY on a UNION/INTERSECT/EXCEPT result must be on "
                 + "one of the result columns.*",
+                //Exasol
+                "order by object not found \\(Session: .+\\)"
             };
             assertQueryFails(sql, errs);
         }
@@ -1172,7 +1183,9 @@ public class DialectTest extends TestCase {
                 "(?s).*scolumn mondrian.time_by_day.the_month must appear in the GROUP BY clause or be used in an aggregate function.*",
                 // Vertica 6
                 "(?s).*ERROR: Column \"time_by_day.the_month\" must appear in "
-                + "the GROUP BY clause or be used in an aggregate function.*"
+                + "the GROUP BY clause or be used in an aggregate function.*",
+                //Exasol
+                "not a valid GROUP BY expression \\(Session: .+\\)"
             };
             assertQueryFails(sql, errs);
         }

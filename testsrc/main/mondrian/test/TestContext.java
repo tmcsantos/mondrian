@@ -1550,6 +1550,7 @@ public class TestContext {
         case ORACLE:
         case LUCIDDB:
         case TERADATA:
+        case EXASOL:
             sql = sql.replaceAll(
                 search,
                 "`fname` || ' ' || `lname`");

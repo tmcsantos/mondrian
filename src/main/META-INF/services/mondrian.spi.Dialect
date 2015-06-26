@@ -25,4 +25,5 @@ mondrian.spi.impl.SybaseDialect
 mondrian.spi.impl.TeradataDialect
 mondrian.spi.impl.VectorwiseDialect
 mondrian.spi.impl.VerticaDialect
+mondrian.spi.impl.ExasolDialect
 mondrian.spi.impl.IngresDialect
