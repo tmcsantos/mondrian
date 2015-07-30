@@ -196,10 +196,9 @@ public class UdfResolver implements Resolver {
         public Object evaluate(Evaluator evaluator) {
             try {
                 return udf.execute(evaluator, args);
-            } catch (CellRequestQuantumExceededException crqee) {
-                // Bug MONDRIAN-2251
-                // percolate back up to RolapResult to be handled.
-                throw crqee;
+            } catch (CellRequestQuantumExceededException e) {
+                // Is assumed will be processed in mondrian.rolap.RolapResult
+                throw e;
             } catch (Exception e) {
                 return FunUtil.newEvalException(
                     "Exception while executing function " + udf.getName(),
