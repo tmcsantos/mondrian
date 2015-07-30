@@ -10,6 +10,7 @@
 package mondrian.olap;
 
 import mondrian.util.ArrayStack;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -33,6 +34,7 @@ import java.util.*;
  * @author jbarnett
  */
 public class QueryTiming {
+    static final Logger LOGGER = Logger.getLogger(QueryTiming.class);
     private boolean enabled;
     private final ArrayStack<TimingInfo> currentTimings =
         new ArrayStack<TimingInfo>();
@@ -40,6 +42,7 @@ public class QueryTiming {
         new HashMap<String, List<StartEnd>>();
     private final Map<String, DurationCount> fullTimings =
         new HashMap<String, DurationCount>();
+
 
     /**
      * Initializes (or re-initializes) a query timing, also setting whether
@@ -100,7 +103,10 @@ public class QueryTiming {
         if (currentTimings.isEmpty()
             || !currentTimings.peek().name.equals(name))
         {
-            throw new IllegalStateException("end but no start for " + name);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("end but no start for " + name);
+            }
+            return;
         }
         TimingInfo finished = currentTimings.pop();
         assert finished.name.equals(name);
