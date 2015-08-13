@@ -124,10 +124,6 @@ public class MemberCacheHelper implements MemberCache {
         mapLevelToMembers.put(level, constraint, members);
     }
 
-    public void flush() {
-        flushCache();
-    }
-
     public List<RolapMember> getChildrenFromCache(
         RolapMember member,
         MemberChildrenConstraint constraint)
