@@ -105,7 +105,7 @@ class MonitorImpl
                 // setting interrupt. But if interrupts are happening, it's
                 // best to know now, rather than failing next time we make a
                 // blocking system call.
-                throw new AssertionError();
+                throw Util.newError("Exception while sending event " + event);
             }
             ACTOR.eventQueue.put(Pair.<Handler, Message>of(handler, event));
         } catch (InterruptedException e) {
