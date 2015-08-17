@@ -6,7 +6,7 @@
 //
 // Copyright (C) 2004-2005 TONBELLER AG
 // Copyright (C) 2005-2005 Julian Hyde
-// Copyright (C) 2005-2014 Pentaho and others
+// Copyright (C) 2005-2015 Pentaho and others
 // All Rights Reserved.
 */
 package mondrian.rolap;
@@ -506,6 +506,10 @@ public abstract class RolapNativeSet extends RolapNative {
             }
             return memberReader;
         }
+    }
+
+    public void flushCache() {
+        cache.clear();
     }
 }
 
