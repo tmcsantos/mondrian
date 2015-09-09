@@ -316,6 +316,7 @@ public class Main extends TestSuite {
             addTest(suite, QueryTest.class);
             addTest(suite, RolapSchemaReaderTest.class);
             addTest(suite, RolapCubeTest.class);
+            addTest(suite, RolapNativeTopCountTest.class);
             addTest(suite, RolapStarTest.class);
             addTest(suite, RolapSchemaPoolTest.class);
             addTest(suite, RolapSchemaPoolConcurrencyTest.class);
@@ -368,6 +369,7 @@ public class Main extends TestSuite {
             addTest(suite, SqlQueryTest.class);
             addTest(suite, CodeSetTest.class);
             addTest(suite, ExplicitRecognizerTest.class);
+            addTest(suite, AggregationOverAggTableTest.class);
 
             if (MondrianProperties.instance().EnableNativeCrossJoin.get()) {
                 addTest(suite, BatchedFillTest.class, "suite");

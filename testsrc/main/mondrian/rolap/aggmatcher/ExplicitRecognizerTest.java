@@ -9,7 +9,6 @@
 */
 package mondrian.rolap.aggmatcher;
 
-import mondrian.spi.Dialect;
 import mondrian.test.*;
 
 import java.sql.*;
@@ -56,7 +55,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `agg_g_ms_pcat_sales_fact_1997`.`the_year` as `c0`,\n"
                 + "    `agg_g_ms_pcat_sales_fact_1997`.`quarter` as `c1`,\n"
@@ -84,7 +83,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `agg_g_ms_pcat_sales_fact_1997`.`the_year` as `c0`,\n"
                 + "    `agg_g_ms_pcat_sales_fact_1997`.`quarter` as `c1`,\n"
@@ -131,7 +130,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `agg_c_14_sales_fact_1997`.`the_year` as `c0`,\n"
                 + "    `agg_c_14_sales_fact_1997`.`quarter` as `c1`,\n"
@@ -172,7 +171,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `agg_c_14_sales_fact_1997`.`the_year` as `c0`,\n"
                 + "    `agg_c_14_sales_fact_1997`.`quarter` as `c1`,\n"
@@ -217,7 +216,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `exp_agg_test`.`testyear` as `c0`,\n"
                 + "    `exp_agg_test`.`testqtr` as `c1`,\n"
@@ -264,7 +263,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `exp_agg_test`.`testyear` as `c0`,\n"
                 + "    `exp_agg_test`.`testqtr` as `c1`,\n"
@@ -313,7 +312,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `exp_agg_test`.`testyear` as `c0`,\n"
                 + "    `exp_agg_test`.`testqtr` as `c1`,\n"
@@ -368,7 +367,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `exp_agg_test_distinct_count`.`gender` as `c0`,\n"
                 + "    `exp_agg_test_distinct_count`.`store_country` as `c1`,\n"
@@ -416,7 +415,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `exp_agg_test_distinct_count`.`testyear` as `c0`,\n"
                 + "    `exp_agg_test_distinct_count`.`gender` as `c1`,\n"
@@ -463,7 +462,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `exp_agg_test_distinct_count`.`testyear` as `c0`,\n"
                 + "    `exp_agg_test_distinct_count`.`store_country` as `c1`,\n"
@@ -492,7 +491,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `exp_agg_test_distinct_count`.`testyear` as `c0`,\n"
                 + "    `exp_agg_test_distinct_count`.`store_name` as `c1`,\n"
@@ -541,7 +540,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
         assertQuerySql(
             testContext,
             query,
-            sqlPattern(
+            mysqlPattern(
                 "select\n"
                 + "    `time_by_day`.`the_year` as `c0`,\n"
                 + "    `customer`.`gender` as `c1`,\n"
@@ -563,15 +562,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
                 + "    `customer`.`gender`"));
     }
 
-    private SqlPattern[] sqlPattern(String sql) {
-        return new SqlPattern[]{
-            new SqlPattern(
-                Dialect.DatabaseProduct.MYSQL,
-                sql,
-                sql.length())};
-    }
-
-    private TestContext setupMultiColDimCube(
+    static TestContext setupMultiColDimCube(
         String aggName, String yearCols, String qtrCols, String monthCols,
         String monthProp)
     {
@@ -579,7 +570,7 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
             aggName, yearCols, qtrCols, monthCols, monthProp, "Unit Sales");
     }
 
-    private TestContext setupMultiColDimCube(
+    static TestContext setupMultiColDimCube(
         String aggName, String yearCols, String qtrCols, String monthCols,
         String monthProp, String defaultMeasure)
     {
@@ -595,6 +586,20 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
             + "      <Level name=\"Store Name\" column=\"store_name\" uniqueMembers=\"true\">\n"
             + "        <Property name=\"Street address\" column=\"store_street_address\" type=\"String\"/>\n"
             + "      </Level>\n"
+            + "    </Hierarchy>\n"
+            + "  </Dimension>\n"
+            + "  <Dimension name=\"Product\">\n"
+            + "    <Hierarchy hasAll=\"true\" primaryKey=\"product_id\" primaryKeyTable=\"product\">\n"
+            + "      <Join leftKey=\"product_class_id\" rightKey=\"product_class_id\">\n"
+            + "        <Table name=\"product\"/>\n"
+            + "        <Table name=\"product_class\"/>\n"
+            + "      </Join>\n"
+            + "      <Level name=\"Product Family\" table=\"product_class\" column=\"product_family\"\n"
+            + "          uniqueMembers=\"true\"/>\n"
+            + "      <Level name=\"Product Department\" table=\"product_class\" column=\"product_department\"\n"
+            + "          uniqueMembers=\"false\"/>\n"
+            + "      <Level name=\"Product Category\" table=\"product_class\" column=\"product_category\"\n"
+            + "          uniqueMembers=\"false\"/>\n"
             + "    </Hierarchy>\n"
             + "  </Dimension>\n"
             + "<Cube name=\"ExtraCol\" defaultMeasure='#DEFMEASURE#'>\n"
@@ -623,7 +628,10 @@ public class ExplicitRecognizerTest extends AggTableTestCase {
             + "    </Hierarchy>\n"
             + "  </Dimension>  "
             + "  <DimensionUsage name=\"Store\" source=\"Store\" foreignKey=\"store_id\"/>"
+            + "  <DimensionUsage name=\"Product\" source=\"Product\" foreignKey=\"product_id\"/>"
             + "<Measure name=\"Unit Sales\" column=\"unit_sales\" aggregator=\"sum\"\n"
+            + "      formatString=\"Standard\" visible=\"false\"/>\n"
+            + "<Measure name=\"Avg Unit Sales\" column=\"unit_sales\" aggregator=\"avg\"\n"
             + "      formatString=\"Standard\" visible=\"false\"/>\n"
             + "  <Measure name=\"Store Cost\" column=\"store_cost\" aggregator=\"sum\"\n"
             + "      formatString=\"#,###.00\"/>\n"
