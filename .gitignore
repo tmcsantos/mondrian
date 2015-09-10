@@ -46,3 +46,4 @@ src/main/mondrian/server/MondrianServerVersion.java
 src/main/mondrian/xmla/DataSourcesConfig.java
 src/main/mondrian/xmla/datasourcesconfig.dtd
 /mondrian.properties
+**/*.iws
