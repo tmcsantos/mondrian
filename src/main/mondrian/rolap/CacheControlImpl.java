@@ -210,7 +210,7 @@ public class CacheControlImpl implements CacheControl {
      *
      * @param cellRegionList List of cell regions
      */
-    protected void flushRegionList(List<CellRegion> cellRegionList) {
+    protected void flushRegionList(List<CellRegion> cellRegionList, CellRegion measuresRegion) {
         final CellRegion cellRegion;
         switch (cellRegionList.size()) {
         case 0:
@@ -225,11 +225,13 @@ public class CacheControlImpl implements CacheControl {
             break;
         }
         if (!containsMeasures(cellRegion)) {
-            for (RolapCube cube : connection.getSchema().getCubeList()) {
-                flush(
-                    createCrossjoinRegion(
-                        createMeasuresRegion(cube),
-                        cellRegion));
+            if(measuresRegion != null){
+                flush(createCrossjoinRegion(measuresRegion, cellRegion));
+            }
+            else {
+                for (RolapCube cube : connection.getSchema().getCubeList()) {
+                    flush(createCrossjoinRegion(createMeasuresRegion(cube), cellRegion));
+                }
             }
         } else {
             flush(cellRegion);
@@ -620,6 +622,10 @@ public class CacheControlImpl implements CacheControl {
     }
 
     public void flush(MemberSet memberSet) {
+      flush(memberSet, null);
+    }
+
+    public void flush(MemberSet memberSet, CellRegion measuresRegion) {
         // REVIEW How is flush(s) different to executing createDeleteCommand(s)?
         synchronized (MEMBER_CACHE_LOCK) {
             // firstly clear all cache associated with native sets
@@ -635,7 +641,7 @@ public class CacheControlImpl implements CacheControl {
             // STUB: flush the set: another visitor
 
             // finally, flush cells now invalid
-            flushRegionList(cellRegionList);
+            flushRegionList(cellRegionList, measuresRegion);
         }
     }
 

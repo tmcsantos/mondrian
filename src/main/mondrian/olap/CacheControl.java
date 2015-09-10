@@ -247,6 +247,14 @@ public interface CacheControl {
     void flush(MemberSet set);
 
     /**
+     * Atomically flushes all members in the member cache which belong to a
+     * given set flushing the relations with the given measure region.
+     *
+     * @param set a set of members
+     */
+    void flush(MemberSet set, CellRegion measureRegion);
+
+    /**
      * Prints the state of the member cache as it pertains to a given member
      * set.
      * @param pw the output target
