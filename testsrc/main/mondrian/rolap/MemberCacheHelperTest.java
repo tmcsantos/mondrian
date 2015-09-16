@@ -122,7 +122,7 @@ public class MemberCacheHelperTest extends TestCase {
     {
         fillChildren(children, 5);
         when(childByNameConstraint.getChildNames()).thenReturn(
-            Arrays.asList(new String[]{ "Other Name", "Other Name2" }));
+            Arrays.asList("Other Name", "Other Name2"));
 
         cacheHelper.putChildren(
             parentMember, constraint, children);
@@ -165,7 +165,8 @@ public class MemberCacheHelperTest extends TestCase {
 
     private MemberKey mockMemberKey() {
         MemberKey mock = mock(MemberKey.class);
-        when(mock.getLevel()).thenReturn(mock(RolapLevel.class));
+        RolapLevel mockLevel = mock(RolapLevel.class);
+        when(mock.getLevel()).thenReturn(mockLevel);
         return mock;
     }
 
