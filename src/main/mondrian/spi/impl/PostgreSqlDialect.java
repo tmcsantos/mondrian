@@ -76,6 +76,10 @@ public class PostgreSqlDialect extends JdbcDialectImpl {
         return DatabaseProduct.POSTGRESQL;
     }
 
+    public String getProductVersion() {
+        return productVersion;
+    }
+
     @Override
     public boolean allowsRegularExpressionInWhereClause() {
         return true;

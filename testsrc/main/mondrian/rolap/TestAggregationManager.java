@@ -24,7 +24,6 @@ import org.olap4j.impl.Olap4jUtil;
 
 import java.util.*;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -1581,9 +1580,23 @@ public class TestAggregationManager extends BatchTestCase {
         final boolean p;
         switch (getTestContext().getDialect().getDatabaseProduct()) {
         case POSTGRESQL:
+            /*
+            -- DROP DATABASE "FM3";
+
+            CREATE DATABASE "FM3"
+              WITH OWNER = postgres
+                   ENCODING = 'UTF8'
+                   TABLESPACE = pg_default
+                   LC_COLLATE = 'C'
+                   LC_CTYPE = 'C'
+                   CONNECTION LIMIT = -1;
+             */
+            p = false;
+
+            // if used above db collation, should work well.
             // Results are slightly different order on Postgres. It collates
             // "Sale Winners" before "Sales Days", because " " < "A".
-            p = true;
+            //p = true;
             break;
         default:
             p = false;

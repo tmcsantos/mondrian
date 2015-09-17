@@ -607,6 +607,7 @@ public class XmlaBasicTest extends XmlaBaseTestCase {
             case NEOVIEW:
             case NETEZZA:
             case TERADATA:
+            case EXASOL:
                 content = Util.replace(
                     content,
                     " sql:field=\"Store Sqft\" type=\"xsd:double\"",

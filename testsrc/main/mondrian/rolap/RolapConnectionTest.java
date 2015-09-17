@@ -2,6 +2,7 @@ package mondrian.rolap;
 
 import mondrian.olap.*;
 import mondrian.spi.Dialect;
+import mondrian.spi.impl.PostgreSqlDialect;
 import mondrian.test.TestContext;
 import mondrian.util.Pair;
 
@@ -435,12 +436,16 @@ public class RolapConnectionTest extends TestCase {
                             + "for user 'bogususer'") >= 0);
                     break;
                 case POSTGRESQL:
-                    assertTrue(
-                        s,
-                        s.indexOf(
+                    PostgreSqlDialect pgsql = (PostgreSqlDialect) dialect;
+                    final String error =
+                        pgsql.getProductVersion().compareTo("8.3") >= 0 ?
                             "Caused by: org.postgresql.util.PSQLException: "
-                            + "FATAL: password authentication failed for "
-                            + "user \"bogususer\"") >= 0);
+                                + "FATAL: role \"bogususer\" does not exist"
+                            :
+                            "Caused by: org.postgresql.util.PSQLException: "
+                                + "FATAL: password authentication failed for "
+                                + "user \"bogususer\"";
+                    assertTrue(s, s.indexOf(error) >= 0);
                     break;
                 }
             } finally {
