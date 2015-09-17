@@ -16,6 +16,16 @@ public class ExasolDialect extends JdbcDialectImpl {
     private final String escapeRegexp = "(\\\\Q([^\\\\Q]+)\\\\E)";
     private final Pattern escapePattern = Pattern.compile(escapeRegexp);
 
+    public static final JdbcDialectFactory FACTORY =
+        new JdbcDialectFactory(
+            ExasolDialect.class,
+            DatabaseProduct.EXASOL)
+        {
+            protected boolean acceptsConnection(Connection connection) {
+                return isDatabase(DatabaseProduct.EXASOL, connection);
+            }
+        };
+
     public ExasolDialect(Connection connection) throws SQLException {
         super(connection);
     }
@@ -41,11 +51,15 @@ public class ExasolDialect extends JdbcDialectImpl {
     }
 
     @Override
-    public String generateInline(List<String> columnNames, List<String> columnTypes, List<String[]> valueList) {
-        return generateInlineGeneric(columnNames, columnTypes, valueList, " from dual", false);
+    public String generateInline(
+        List<String> columnNames,
+        List<String> columnTypes,
+        List<String[]> valueList)
+    {
+        return generateInlineGeneric(
+            columnNames, columnTypes, valueList, " from dual", false);
     }
 
-    @Override
     public DatabaseProduct getDatabaseProduct() {
         return DatabaseProduct.EXASOL;
     }
