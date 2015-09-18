@@ -447,7 +447,15 @@ public class RolapConnectionTest extends TestCase {
                                 + "user \"bogususer\"";
                     assertTrue(s, s.indexOf(error) >= 0);
                     break;
-                }
+                case EXASOL:
+                    assertTrue(
+                        s,
+                        s.indexOf(
+                            "Caused by: com.exasol.jdbc.LoginRefused: "
+                                + "Connection exception" +
+                                " - authentication failed.") >= 0);
+                    break;
+            }
             } finally {
                 if (connection != null) {
                     connection.close();
