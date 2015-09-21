@@ -11,6 +11,7 @@ package mondrian.rolap.agg;
 
 import mondrian.rolap.*;
 import mondrian.rolap.sql.SqlQuery;
+import mondrian.spi.Dialect;
 
 import java.util.*;
 
@@ -142,6 +143,16 @@ public class OrPredicate extends ListPredicate {
         }
 
         buf.append("(");
+        // EXASOL parser bug, for some reason sql like
+        // ((("store_state", "gender") in (('CA', 'F'), ('CA', 'M'))))
+        // is syntactically incorrect but if we prefix with something
+        // like ((true and (...))) it passes
+        if (sqlQuery
+            .getDialect()
+            .getDatabaseProduct() == Dialect.DatabaseProduct.EXASOL)
+        {
+            buf.append("true and ");
+        }
         // First generate nulls for the columns which will not be included
         // in the IN list
 

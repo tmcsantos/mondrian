@@ -194,7 +194,7 @@ public class SqlConstraintUtils {
     }
 
     /**
-     * Same as {@link addConstraint} but uses tuples
+     * Same as {@link TupleConstraint#addConstraint} but uses tuples
      */
     private static void addContextConstraintTuples(
         SqlQuery sqlQuery,
@@ -1830,6 +1830,16 @@ public class SqlConstraintUtils {
 
         StringBuilder condition = new StringBuilder();
         if (memberOrdinal > 0) {
+            // EXASOL parser bug, for some reason sql like
+            // ((("store_state", "gender") in (('CA', 'F'), ('CA', 'M'))))
+            // is syntactically incorrect but if we prefix with something
+            // like ((true and (...))) it passes
+            if (sqlQuery
+                .getDialect()
+                .getDatabaseProduct() == Dialect.DatabaseProduct.EXASOL)
+            {
+                condition.append("true and ");
+            }
             // SQLs are generated for some members.
             condition.append(columnBuf);
             condition.append(" in ");

@@ -105,52 +105,28 @@ public class ExasolDialect extends JdbcDialectImpl {
         return true;
     }
 
-    //    @Override
-//    public SqlStatement.Type getType(
-//            ResultSetMetaData metaData, int columnIndex)
-//            throws SQLException
-//    {
-//
-//        final int columnType = metaData.getColumnType(columnIndex + 1);
-//        final int precision = metaData.getPrecision(columnIndex + 1);
-//        final int scale = metaData.getScale(columnIndex + 1);
-//        final String columnName = metaData.getColumnName(columnIndex + 1);
-//        SqlStatement.Type type;
-//
-//        if (columnType == Types.NUMERIC || columnType == Types.DECIMAL) {
-//            if (scale == -127 && precision != 0) {
-//                // non zero precision w/ -127 scale means float in Oracle.
-//                type = SqlStatement.Type.DOUBLE;
-//            } else if (columnType == Types.NUMERIC
-//                    && (scale == 0 || scale == -127)
-//                    && precision == 0 && columnName.startsWith("m"))
-//            {
-//                // In GROUPING SETS queries, Oracle
-//                // loosens the type of columns compared to mere GROUP BY
-//                // queries. We need integer GROUP BY columns to remain integers,
-//                // otherwise the segments won't be found; but if we convert
-//                // measure (whose column names are like "m0", "m1") to integers,
-//                // data loss will occur.
-//                type = SqlStatement.Type.OBJECT;
-//            } else if (scale == -127 && precision ==0) {
-//                type = SqlStatement.Type.INT;
-//            } else if (scale == 0 && (precision == 38 || precision == 0)) {
-//                // NUMBER(38, 0) is conventionally used in
-//                // Oracle for integers of unspecified precision, so let's be
-//                // bold and assume that they can fit into an int.
-//                type = SqlStatement.Type.INT;
-//            } else if (scale == 0 && precision <= 9) {
-//                // An int (up to 2^31 = 2.1B) can hold any NUMBER(10, 0) value
-//                // (up to 10^9 = 1B).
-//                type = SqlStatement.Type.INT;
-//            } else {
-//                type = SqlStatement.Type.DOUBLE;
-//            }
-//
-//        } else {
-//            type = super.getType(metaData, columnIndex);
-//        }
-//        return type;
-//    }
+        @Override
+    public SqlStatement.Type getType(
+            ResultSetMetaData metaData, int columnIndex)
+            throws SQLException
+    {
+        final int columnType = metaData.getColumnType(columnIndex + 1);
+
+        SqlStatement.Type internalType = null;
+        if (columnType == Types.NUMERIC || columnType == Types.DECIMAL) {
+            final int precision = metaData.getPrecision(columnIndex + 1);
+            final int scale = metaData.getScale(columnIndex + 1);
+            if (scale == 0 && precision <= 18) {
+                internalType = SqlStatement.Type.INT;
+            } else if (scale == 0 && precision <= 36) {
+                internalType = SqlStatement.Type.LONG;
+            } else {
+                internalType = SqlStatement.Type.DOUBLE;
+            }
+        } else {
+            internalType = super.getType(metaData, columnIndex);
+        }
+        return internalType;
+    }
 
 }

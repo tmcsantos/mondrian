@@ -569,7 +569,8 @@ public class ParentChildHierarchyTest extends FoodMartTestCase {
      * Script from <a href="http://www.winscriptingsolutions.com/Files/09/27139/Listing_02.txt">here</a>.
      */
     public void testParentChildDescendantsLeavesTop() {
-        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())) {
+        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())
+            || Bug.avoidSlowTestOnEXASol(getTestContext().getDialect())) {
             return;
         }
         assertQueryReturns(
@@ -684,7 +685,8 @@ public class ParentChildHierarchyTest extends FoodMartTestCase {
      * dimensions (3) than the depth of the emp dimension (6).
      */
     public void testHierarchyFalseCycle() {
-        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())) {
+        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())
+            || Bug.avoidSlowTestOnEXASol(getTestContext().getDialect())) {
             return;
         }
         // On the regular HR cube, this has always worked.
@@ -1009,7 +1011,8 @@ public class ParentChildHierarchyTest extends FoodMartTestCase {
      * "Sorting of Parent/Child Hierarchy is wrong"</a>.
      */
     public void testParentChildOrdinal() {
-        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())) {
+        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())
+            || Bug.avoidSlowTestOnEXASol(getTestContext().getDialect())) {
             return;
         }
         final TestContext testContext = TestContext.instance().create(
@@ -1173,7 +1176,8 @@ public class ParentChildHierarchyTest extends FoodMartTestCase {
      * a class cast exception when using non-closure parent child hierarchies.
      */
     public void testClosureVsNoClosure() {
-        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())) {
+        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())
+            || Bug.avoidSlowTestOnEXASol(getTestContext().getDialect())) {
             return;
         }
         String cubestart =

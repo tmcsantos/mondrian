@@ -284,6 +284,14 @@ public class Bug {
             && !Logger.getLogger("mondrian.test.PerformanceTest")
                 .isDebugEnabled();
     }
+
+    public static boolean avoidSlowTestOnEXASol(Dialect dialect) {
+        return
+            !BugMondrian759Fixed
+            && dialect.getDatabaseProduct() == Dialect.DatabaseProduct.EXASOL
+            && !Logger.getLogger("mondrian.test.PerformanceTest")
+                .isDebugEnabled();
+    }
 }
 
 // End Bug.java

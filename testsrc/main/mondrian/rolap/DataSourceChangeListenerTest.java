@@ -193,7 +193,8 @@ public class DataSourceChangeListenerTest extends BatchTestCase {
         if (true) {
             return;
         }
-        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())) {
+        if (Bug.avoidSlowTestOnLucidDB(getTestContext().getDialect())
+            || Bug.avoidSlowTestOnEXASol(getTestContext().getDialect())) {
             return;
         }
         // 5 threads, 8 cycles each

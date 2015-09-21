@@ -1277,6 +1277,10 @@ public class FastBatchingCellReaderTest extends BatchTestCase {
         case VERTICA:
             // Vertica says "Aggregate function calls cannot contain subqueries"
             return;
+        case EXASOL:
+            // EXASOL says "[0A000] Feature not supported: this kind of
+            // correlated subselect"
+            return;
         }
 
         String cube =
