@@ -1534,10 +1534,10 @@ public class DrillThroughTest extends FoodMartTestCase {
             while (rs.next()) {
                 assertEquals(
                     "Each year in results should be 1997",
-                    1997, rs.getObject(1));
+                    1997, rs.getInt(1));
                 assertEquals(
                     "Each gender in results should be F",
-                    "F", rs.getObject(2));
+                    "F", rs.getString(2));
                 assertNotNull(
                     "Should be a non-null value for unit sales",
                     rs.getObject(3));

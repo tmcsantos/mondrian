@@ -104,9 +104,9 @@ public class DeadlockTest extends FoodMartTestCase {
         });
         try {
             bigQueryThread.start();
-            // give the query 10 seconds to complete.  Likely deadlock if
+            // give the query 20 seconds to complete.  Likely deadlock if
             // it hasn't finished.
-            bigQueryThread.join(10000);
+            bigQueryThread.join(20000);
             assertEquals(
                 "Possible deadlock, query thread is still alive.",
                 false, bigQueryThread.isAlive());

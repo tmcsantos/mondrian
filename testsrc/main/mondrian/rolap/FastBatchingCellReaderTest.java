@@ -199,6 +199,7 @@ public class FastBatchingCellReaderTest extends BatchTestCase {
         case DB2_AS400:
         case DB2_OLD_AS400:
         case GREENPLUM:
+        case EXASOL:
             assertTrue(fbcr.getDialect().supportsGroupingSets());
             break;
         default:
