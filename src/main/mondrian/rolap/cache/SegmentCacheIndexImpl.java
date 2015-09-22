@@ -518,11 +518,15 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
 
     public Future<SegmentBody> getFuture(Execution exec, SegmentHeader header) {
         checkThread();
-        HeaderInfo hi = headerMap.get(header);
-        if (!hi.clients.contains(exec)) {
-            hi.clients.add(exec);
+        HeaderInfo headerInfo = headerMap.get(header);
+        if (headerInfo == null) {
+            headerInfo = new HeaderInfo(null);
+            headerMap.put(header, headerInfo);
         }
-        return hi.slot;
+        if (!headerInfo.clients.contains(exec)) {
+            headerInfo.clients.add(exec);
+        }
+        return headerInfo.slot;
     }
 
     public void linkSqlStatement(SegmentHeader header, Statement stmt) {
@@ -1053,26 +1057,30 @@ public class SegmentCacheIndexImpl implements SegmentCacheIndex {
      * object which we pass to clients.
      */
     private static class HeaderInfo {
+        // using package access in fields to avoid creating unnecessary objects,
+        // and uses direct field access,
+        // see http://www.javacodegeeks.com/2012/05/java-pitfalls-field-access-in-inner.html.
+
         /**
          * The SQL statement populating this header.
          * Will be null until the SQL thread calls us back to register it.
          */
-        private Statement stmt;
+        Statement stmt;
         /**
          * The future object to pass on to clients.
          */
-        private final SlotFuture<SegmentBody> slot;
+        final SlotFuture<SegmentBody> slot;
         /**
          * A list of clients interested in this segment.
          */
-        private final List<Execution> clients =
+        final List<Execution> clients =
             new CopyOnWriteArrayList<Execution>();
         /**
          * Whether this segment is already considered stale and must
          * be deleted after it is done loading. This can happen
          * when flushing.
          */
-        private boolean removeAfterLoad;
+        boolean removeAfterLoad;
 
         HeaderInfo(SlotFuture<SegmentBody> slot) {
             this.slot = slot;
