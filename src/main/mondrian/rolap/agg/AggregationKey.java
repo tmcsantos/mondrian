@@ -79,9 +79,7 @@ public class AggregationKey
         return computeHashCode(
             constrainedColumnsBitKey,
             star,
-            compoundPredicateList == null
-                ? null
-                : new AbstractList<BitKey>() {
+            new AbstractList<BitKey>() {
                     public BitKey get(int index) {
                         return compoundPredicateList.get(index)
                             .getConstrainedColumnBitKey();

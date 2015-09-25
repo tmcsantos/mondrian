@@ -63,7 +63,8 @@ public abstract class OlapElementBase
      * @return hash code
      */
     protected int computeHashCode() {
-        return (getClass().hashCode() << 8) ^ getUniqueName().hashCode();
+        int h = Util.hashdjb2(getUniqueName().getBytes());
+        return (getClass().hashCode() << 16) ^ h;
     }
 
     public String toString() {

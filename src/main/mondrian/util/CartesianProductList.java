@@ -4,7 +4,7 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+* Copyright (c) 2002-2015 Pentaho Corporation..  All rights reserved.
 */
 
 package mondrian.util;
@@ -23,45 +23,53 @@ public class CartesianProductList<T>
     implements RandomAccess
 {
     private final List<List<T>> lists;
+    private final int size;
+    private final int[] offsets;
 
     public CartesianProductList(List<List<T>> lists) {
         super();
         this.lists = lists;
+        this.offsets = new int[lists.size()];
+        // calculate size
+        int n = 1, ordinal=0;
+        for (List<T> list : lists) {
+            int size = list.size();
+            n *= size;
+            offsets[ordinal++] = size;
+        }
+        this.size = n;
     }
 
     @Override
     public List<T> get(int index) {
         final List<T> result = new ArrayList<T>();
-        for (int i = lists.size(); --i >= 0;) {
-            final List<T> list = lists.get(i);
-            final int size = list.size();
-            int y = index % size;
+        int size, idx, arity = lists.size();
+        for (int i = arity; --i >= 0;) {
+            size = offsets[i];
+            idx = index % size;
             index /= size;
-            result.add(0, list.get(y));
+            final List<T> list = lists.get(i);
+            result.add(0, list.get(idx));
         }
         return result;
     }
 
     @Override
     public int size() {
-        int n = 1;
-        for (List<T> list : lists) {
-            n *= list.size();
-        }
-        return n;
+        return size;
     }
 
     public void getIntoArray(int index, Object[] a) {
-        int n = 0;
-        for (int i = lists.size(); --i >= 0;) {
-            final List<T> list = lists.get(i);
-            final int size = list.size();
-            int y = index % size;
+        int n = 0, size, idx, arity = lists.size();
+        for (int i = arity; --i >= 0;) {
+            size = offsets[i];
+            idx = index % size;
             index /= size;
-            Object t = list.get(y);
+            Object t = lists.get(i).get(idx);
             if (t instanceof List) {
                 List tList = (List) t;
-                for (int j = tList.size(); --j >= 0;) {
+                int ar = tList.size();
+                for (int j = ar; --j >= 0;) {
                     a[n++] = tList.get(j);
                 }
             } else {
