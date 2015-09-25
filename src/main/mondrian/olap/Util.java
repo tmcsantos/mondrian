@@ -2925,6 +2925,17 @@ public class Util extends XOMUtil {
         return (i << 4) ^ j;
     }
 
+    public static int hashdjb2(byte[] a) {
+        if (a == null) {
+            return 0;
+        }
+        int h = 5381, i = 0;
+        for (;i < a.length; i++) {
+            h = ((h << 5) + h) + a[i];
+        }
+        return h;
+    }
+
     /**
      * Computes a hash code from an existing hash code and an object (which
      * may be null).

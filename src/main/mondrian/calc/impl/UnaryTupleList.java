@@ -31,6 +31,7 @@ public class UnaryTupleList
     implements TupleList
 {
     final List<Member> list;
+    final UnaryIterator tupleIteratorInstance = new UnaryIterator();
 
     /**
      * Creates an empty UnaryTupleList.
@@ -118,11 +119,13 @@ public class UnaryTupleList
     }
 
     public TupleIterator tupleIterator() {
-        return new UnaryIterator();
+        return tupleIteratorInstance.reset();
+//        return new UnaryIterator();
     }
 
     public final Iterator<List<Member>> iterator() {
-        return tupleIterator();
+        return new UnaryIterator();
+        //return tupleIterator();
     }
 
     public TupleList project(int[] destIndices) {
@@ -217,11 +220,11 @@ public class UnaryTupleList
         }
 
         public boolean forward() {
-            if (cursor == size()) {
-                return false;
+            if (cursor - size() < 0) {
+                lastRet = cursor++;
+                return true;
             }
-            lastRet = cursor++;
-            return true;
+            return false;
         }
 
         public List<Member> current() {
@@ -233,7 +236,7 @@ public class UnaryTupleList
         }
 
         public void remove() {
-            if (lastRet == -1) {
+            if (lastRet < 0) {
                 throw new IllegalStateException();
             }
             try {
@@ -254,6 +257,12 @@ public class UnaryTupleList
         public Member member(int column) {
             assert column == 0;
             return list.get(lastRet);
+        }
+
+        public UnaryIterator reset() {
+            this.cursor = 0;
+            this.lastRet = -1;
+            return this;
         }
     }
 }

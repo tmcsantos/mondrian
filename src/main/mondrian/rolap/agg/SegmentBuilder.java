@@ -297,8 +297,8 @@ public class SegmentBuilder {
         // a stripe of values from the and add them up into a single cell.
         final Map<CellKey, List<Object>> cellValues =
             new HashMap<CellKey, List<Object>>();
-        List<List<Comparable>> addedIntersections =
-            new ArrayList<List<Comparable>>();
+        Set<List<Comparable>> addedIntersections =
+            new HashSet<List<Comparable>>();
 
         for (Map.Entry<SegmentHeader, SegmentBody> entry : map.entrySet()) {
             final int[] pos = new int[axes.length];

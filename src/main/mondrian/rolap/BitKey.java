@@ -1167,7 +1167,7 @@ public interface BitKey
         public int hashCode() {
             long h = 1234;
             h ^= bits0;
-            h ^= bits1 * 2;
+            h ^= bits1 << 1;
             return (int)((h >> 32) ^ h);
         }
 

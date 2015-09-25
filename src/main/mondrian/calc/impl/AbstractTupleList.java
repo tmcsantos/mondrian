@@ -114,11 +114,11 @@ public abstract class AbstractTupleList
         }
 
         public boolean forward() {
-            if (cursor == size()) {
-                return false;
+            if (cursor - size() < 0) {
+                lastRet = cursor++;
+                return true;
             }
-            lastRet = cursor++;
-            return true;
+            return false;
         }
 
         public List<Member> current() {
