@@ -66,6 +66,10 @@
   <property name="xom.jar.file" value="${lib.dir}/eigenbase-xom.jar"/>
   <property name="jdk.home" value="${env.JAVA_HOME}"/>
 
+  <tstamp>
+    <format property="copyright.year" pattern="yyyy"/>
+  </tstamp>
+
   <!-- Override this to tell Subfloor how to run the junit & jacoco -->
   <property name="junit.test.pattern" value="mondrian/test/Main.java"/>
 
@@ -339,7 +343,7 @@ demo/FoodMartCreateData.sql"/>
           unless="skip.download"
           description="Resolves runtime dependencies not required for compilation.">
     <ivy:resolve file="workbench/assembly_ivy.xml"/>
-    <ivy:retrieve symlink="${symlink}" type="jar"
+    <ivy:retrieve symlink="${symlink}"
                   pattern="${wb.plugins.dir}/[module].[ext]"/>
     <ivy:retrieve symlink="${symlink}" type="source,javadoc"
                   pattern="${wb.plugins.dir}/[module]-[type].[ext]"/>
@@ -643,6 +647,7 @@ class MondrianServerVersion {
     static final String VERSION = "${project.revision}";
     static final int MAJOR_VERSION = ${project.revision.major};
     static final int MINOR_VERSION = ${project.revision.minor};
+    static final String COPYRIGHT_YEAR = "${copyright.year}";
 }
 // End MondrianServerVersion.java</echo>
   </target>

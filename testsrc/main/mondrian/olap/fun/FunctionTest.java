@@ -26,6 +26,7 @@ import org.eigenbase.xom.StringEscaper;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 
 /**
  * <code>FunctionTest</code> tests the functions defined in
@@ -6938,6 +6939,38 @@ public class FunctionTest extends FoodMartTestCase {
             "1997 and 1998");
     }
 
+    public void testGenerateWillTimeout() {
+        propSaver.set(propSaver.properties.QueryTimeout, 5);
+        propSaver.set(propSaver.properties.EnableNativeNonEmpty, false);
+        try {
+            getTestContext().executeAxis(
+                "Generate([Product].[Product Name].members,"
+                + "  Generate([Customers].[Name].members, "
+                + "    {([Store].CurrentMember, [Product].CurrentMember, [Customers].CurrentMember)}))");
+        } catch (QueryTimeoutException e) {
+            return;
+        } catch (CancellationException e) {
+            return;
+        }
+        fail("should have timed out");
+    }
+
+    public void testFilterWillTimeout() {
+        propSaver.set(propSaver.properties.QueryTimeout, 5);
+        propSaver.set(propSaver.properties.EnableNativeNonEmpty, false);
+        try {
+            getTestContext().executeAxis(
+                "Filter("
+                + "Filter(CrossJoin([Customers].[Name].members, [Product].[Product Name].members), [Measures].[Unit Sales] > 0),"
+                + " [Measures].[Sales Count] > 5) ");
+        } catch (QueryTimeoutException e) {
+            return;
+        } catch (CancellationException e) {
+            return;
+        }
+        fail("should have timed out");
+    }
+
     public void testHead() {
         assertAxisReturns(
             "Head([Store].Children, 2)",
@@ -12335,6 +12368,56 @@ Intel platforms):
                 + "Row #46: 124,366\n"
                 + "Row #46: 263,793.22\n");
         }
+    }
+
+    /**
+     * This is a test for
+     * <a href="http://jira.pentaho.com/browse/MONDRIAN-2157">MONDRIAN-2157</a>
+     * <p/>
+     * <p>The results should be equivalent either we use aliases or not</p>
+     */
+    public void testTopPercentWithAlias() {
+        final String queryWithoutAlias =
+            "select\n"
+            + " {[Measures].[Store Cost]}on rows,\n"
+            + " TopPercent([Product].[Brand Name].Members*[Time].[1997].children,"
+            + " 50, [Measures].[Unit Sales]) on columns\n"
+            + "from Sales";
+        String queryWithAlias =
+            "with\n"
+            + " set [*aaa] as '[Product].[Brand Name].Members*[Time].[1997].children'\n"
+            + "select\n"
+            + " {[Measures].[Store Cost]}on rows,\n"
+            + " TopPercent([*aaa], 50, [Measures].[Unit Sales]) on columns\n"
+            + "from Sales";
+        final TestContext context = TestContext.instance();
+        final Result result = context.executeQuery(queryWithoutAlias);
+        context.assertQueryReturns(
+            queryWithAlias,
+            context.toString(result));
+    }
+
+    /**
+     * This is a test for
+     * <a href="http://jira.pentaho.com/browse/MONDRIAN-1187">MONDRIAN-1187</a>
+     * <p/>
+     * <p>The results should be equivalent</p>
+     */
+    public void testMondrian_1187() {
+        final String queryWithoutAlias =
+            "WITH\n" + "SET [Top Count] AS\n" + "{\n" + "TOPCOUNT(\n" + "DISTINCT([Customers].[Name].Members),\n"
+                + "5,\n" + "[Measures].[Unit Sales]\n" + ")\n" + "}\n" + "SELECT\n"
+                + "[Top Count] * [Measures].[Unit Sales] on 0\n" + "FROM [Sales]\n"
+                + "WHERE [Time].[1997].[Q1].[1] : [Time].[1997].[Q3].[8]";
+        String queryWithAlias =
+            "SELECT\n"
+                + "TOPCOUNT( DISTINCT( [Customers].[Name].Members), 5, [Measures].[Unit Sales]) * [Measures].[Unit Sales] on 0\n"
+                + "FROM [Sales]\n" + "WHERE [Time].[1997].[Q1].[1]:[Time].[1997].[Q3].[8]";
+        final TestContext context = TestContext.instance();
+        final Result result = context.executeQuery(queryWithoutAlias);
+        context.assertQueryReturns(
+            queryWithAlias,
+            context.toString(result));
     }
 }
 
