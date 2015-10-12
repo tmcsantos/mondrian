@@ -1525,6 +1525,7 @@ public class RolapResult extends ResultBase {
         private int axisCount;
         private boolean countOnly;
         private Execution execution;
+        private final int checkCancelPeriod;
 
         AxisMemberList() {
             this.countOnly = false;
@@ -1534,6 +1535,8 @@ public class RolapResult extends ResultBase {
             // Now that the axes are evaluated, make sure that the number of
             // cells does not exceed the result limit.
             this.limit = MondrianProperties.instance().ResultLimit.get();
+            this.checkCancelPeriod =
+                MondrianProperties.instance().CancelPhaseInterval.get();
         }
 
         public void setExecution(Execution execution) {
@@ -1605,7 +1608,14 @@ public class RolapResult extends ResultBase {
 
         private void mergeTuple(final TupleCursor cursor) {
             final int arity = cursor.getArity();
+            int rowCount = -1;
             for (int i = 0; i < arity; i++) {
+                rowCount++;
+                if (checkCancelPeriod > 0
+                    && rowCount % checkCancelPeriod == 0)
+                {
+                    execution.checkCancelOrTimeout();
+                }
                 mergeMember(cursor.member(i));
             }
         }
@@ -1613,8 +1623,6 @@ public class RolapResult extends ResultBase {
         private void mergeMember(final Member member) {
             this.axisCount++;
             if (! countOnly) {
-                // make sure if execution is still valid.
-                execution.checkCancelOrTimeout();
                 if (isSlicer) {
                     if (! members.contains(member)) {
                         members.add(member);
