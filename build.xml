@@ -364,13 +364,19 @@ demo/FoodMartCreateData.sql"/>
     <unjar src="${lib.dir}/servlet-api.jar" dest="${crtmp.dir}"/>
 
     <unjar dest="${crtmp.dir}">
-        <fileset dir="${lib.dir}">
-            <include name="**/*.jar"/>
-            <exclude name="**/junit.zip"/>
-        </fileset>
+      <fileset dir="${devlib.dir}">
+          <include name="**/*.jar"/>
+      </fileset>
     </unjar>
 
-    <copy file="./log4j.properties" todir="${crtmp.dir}"/>
+    <unjar dest="${crtmp.dir}">
+      <fileset dir="${lib.dir}">
+          <include name="**/*.jar"/>
+          <exclude name="**/junit.zip"/>
+      </fileset>
+    </unjar>
+
+    <copy file="./log4j.xml" todir="${crtmp.dir}"/>
 
     <jar destfile="${lib.dir}/cmdrunner.jar" >
       <fileset dir="${crtmp.dir}" >

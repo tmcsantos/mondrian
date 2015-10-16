@@ -781,6 +781,16 @@ If enabled some Filter() will be computed in SQL.
         <Default>true</Default>
     </PropertyDefinition>
     <PropertyDefinition>
+        <Name>EnableNativeExcept</Name>
+        <Path>mondrian.native.except.enable</Path>
+        <Category>SQL generation</Category>
+        <Description>
+            If enabled some Except() will be computed in SQL.
+        </Description>
+        <Type>boolean</Type>
+        <Default>false</Default>
+    </PropertyDefinition>
+    <PropertyDefinition>
         <Name>EnableNativeNonEmpty</Name>
         <Path>mondrian.native.nonempty.enable</Path>
         <Category>SQL generation</Category>

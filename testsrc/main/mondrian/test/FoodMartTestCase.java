@@ -5,7 +5,7 @@
 // You must accept the terms of that agreement to use this software.
 //
 // Copyright (C) 2002-2005 Julian Hyde
-// Copyright (C) 2005-2013 Pentaho and others
+// Copyright (C) 2005-2015 Pentaho and others
 // All Rights Reserved.
 //
 // jhyde, 29 March, 2002
@@ -428,13 +428,15 @@ public class FoodMartTestCase extends TestCase {
         propSaver.set(propSaver.properties.EnableNativeFilter, true);
         propSaver.set(propSaver.properties.EnableNativeNonEmpty, true);
         propSaver.set(propSaver.properties.EnableNativeTopCount, true);
+        propSaver.set(propSaver.properties.EnableNativeExcept, true);
 
         Result resultNative = context.executeQuery(query);
 
         propSaver.set(propSaver.properties.EnableNativeCrossJoin, false);
         propSaver.set(propSaver.properties.EnableNativeFilter, false);
         propSaver.set(propSaver.properties.EnableNativeNonEmpty, false);
-        propSaver.set(propSaver.properties.EnableNativeTopCount, true);
+        propSaver.set(propSaver.properties.EnableNativeTopCount, false);
+        propSaver.set(propSaver.properties.EnableNativeExcept, false);
 
         Result resultNonNative = context.executeQuery(query);
 
