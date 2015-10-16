@@ -36,13 +36,23 @@ class ExceptFunDef extends FunDefBase {
         super(dummyFunDef);
     }
 
-    public Calc compileCall(ResolvedFunCall call, ExpCompiler compiler) {
+    public Calc compileCall(final ResolvedFunCall call, ExpCompiler compiler) {
         // todo: implement ALL
         final ListCalc listCalc0 = compiler.compileList(call.getArg(0));
         final ListCalc listCalc1 = compiler.compileList(call.getArg(1));
         return new AbstractListCalc(call, new Calc[] {listCalc0, listCalc1})
         {
             public TupleList evaluateList(Evaluator evaluator) {
+                // Use a native evaluator, if more efficient.
+                SchemaReader schemaReader = evaluator.getSchemaReader();
+                NativeEvaluator nativeEvaluator =
+                    schemaReader.getNativeSetEvaluator(
+                        call.getFunDef(), call.getArgs(), evaluator, this);
+                if (nativeEvaluator != null) {
+                    return
+                        (TupleList) nativeEvaluator.execute(ResultStyle.LIST);
+                }
+
                 TupleList list0 = listCalc0.evaluateList(evaluator);
                 if (list0.isEmpty()) {
                     return list0;

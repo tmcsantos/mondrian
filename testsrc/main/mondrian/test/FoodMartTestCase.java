@@ -428,6 +428,7 @@ public class FoodMartTestCase extends TestCase {
         propSaver.set(propSaver.properties.EnableNativeFilter, true);
         propSaver.set(propSaver.properties.EnableNativeNonEmpty, true);
         propSaver.set(propSaver.properties.EnableNativeTopCount, true);
+        propSaver.set(propSaver.properties.EnableNativeExcept, true);
 
         Result resultNative = context.executeQuery(query);
 
@@ -435,6 +436,7 @@ public class FoodMartTestCase extends TestCase {
         propSaver.set(propSaver.properties.EnableNativeFilter, false);
         propSaver.set(propSaver.properties.EnableNativeNonEmpty, false);
         propSaver.set(propSaver.properties.EnableNativeTopCount, false);
+        propSaver.set(propSaver.properties.EnableNativeExcept, false);
 
         Result resultNonNative = context.executeQuery(query);
 

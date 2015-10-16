@@ -12,8 +12,7 @@ package mondrian.rolap;
 
 import mondrian.mdx.*;
 import mondrian.olap.*;
-import mondrian.olap.type.MemberType;
-import mondrian.olap.type.StringType;
+import mondrian.olap.type.*;
 import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.sql.SqlQuery;
 import mondrian.spi.Dialect;
@@ -35,6 +34,7 @@ public class RolapNativeSql {
 
     CompositeSqlCompiler numericCompiler;
     CompositeSqlCompiler booleanCompiler;
+    CompositeSqlCompiler memberCompiler;
 
     RolapStoredMeasure storedMeasure;
     final AggStar aggStar;
@@ -394,6 +394,31 @@ public class RolapNativeSql {
         }
     }
 
+    class BaseMemberSqlCompiler extends MemberSqlCompiler {
+        public String compile(Exp exp) {
+            exp = unwind(exp);
+            if (!(exp instanceof MemberExpr)) {
+                return null;
+            }
+            final Member member = ((MemberExpr) exp).getMember();
+            if (!(member instanceof RolapCubeMember)) {
+                return null;
+            }
+
+            if (!(member.getMemberType() == Member.MemberType.REGULAR)) {
+                return null;
+            }
+
+            StringBuilder buf = new StringBuilder();
+            dialect.quoteStringLiteral(buf, member.getName());
+            return buf.toString();
+        }
+
+        public String toString() {
+            return "MemberSqlCompiler";
+        }
+    }
+
     /**
      * Contains utility methods to compile FunCall expressions into SQL.
      */
@@ -608,6 +633,69 @@ public class RolapNativeSql {
         }
     }
 
+    class ExceptSqlCompiler extends FunCallSqlCompilerBase {
+        private SqlCompiler compiler;
+
+        protected ExceptSqlCompiler(
+            int category,
+            SqlCompiler compiler)
+        {
+            super(category, "{}", -1);
+            this.compiler = compiler;
+        }
+
+        protected boolean match(Exp exp) {
+            if ((exp.getCategory() & category) == 0) {
+                return false;
+            }
+            if (!(exp instanceof FunCall)) {
+                return false;
+            }
+            FunCall fc = (FunCall) exp;
+            if (!mdx.equalsIgnoreCase(fc.getFunName())) {
+                return false;
+            }
+            return true;
+        }
+
+        protected String[] compileArgs(Exp exp, SqlCompiler compiler) {
+            if (!match(exp)) {
+                return null;
+            }
+            Exp[] args = ((FunCall) exp).getArgs();
+            String[] sqls = new String[args.length];
+            for (int i = 0; i < args.length; i++) {
+                sqls[i] = compiler.compile(args[i]);
+                if (sqls[i] == null) {
+                    return null;
+                }
+            }
+            return sqls;
+        }
+
+        public String compile(Exp exp) {
+            String[] args = compileArgs(exp, compiler);
+            if (args == null) {
+                return null;
+            }
+
+            String sourceExp = rolapLevel.getKeyExp().getExpression(sqlQuery);
+
+            StringBuilder buf = new StringBuilder();
+            buf.append(sourceExp);
+            buf.append(" not in");
+            buf.append("(");
+            for (int i = 0; i < args.length; i++) {
+                if (i > 0) {
+                    buf.append(", ");
+                }
+                buf.append(args[i]);
+            }
+            buf.append(") ");
+            return buf.toString();
+        }
+    }
+
     /**
      * Creates a RolapNativeSql.
      *
@@ -628,7 +716,9 @@ public class RolapNativeSql {
 
         numericCompiler = new CompositeSqlCompiler();
         booleanCompiler = new CompositeSqlCompiler();
+        memberCompiler = new CompositeSqlCompiler();
 
+        memberCompiler.add(new BaseMemberSqlCompiler());
         numericCompiler.add(new NumberSqlCompiler());
         numericCompiler.add(new StoredMeasureSqlCompiler());
         numericCompiler.add(new CalculatedMemberSqlCompiler(numericCompiler));
@@ -686,6 +776,11 @@ public class RolapNativeSql {
             new ParenthesisSqlCompiler(Category.Logical, booleanCompiler));
         booleanCompiler.add(
             new IifSqlCompiler(Category.Logical, booleanCompiler));
+
+        booleanCompiler.add(
+            new ExceptSqlCompiler(Category.Set, memberCompiler));
+
+
     }
 
     /**
