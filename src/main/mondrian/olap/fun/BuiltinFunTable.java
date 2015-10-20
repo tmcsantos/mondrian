@@ -918,6 +918,7 @@ public class BuiltinFunTable extends FunTableImpl {
 
         builder.define(ExceptFunDef.Resolver);
         builder.define(ExistsFunDef.resolver);
+        builder.define(NonEmptyFunDef.resolver);
         builder.define(ExtractFunDef.Resolver);
         builder.define(FilterFunDef.instance);
 
