@@ -6197,6 +6197,34 @@ public class NonEmptyTest extends BatchTestCase {
             + "Row #12: 3\n");
     }
 
+    public void testNativeNonEmpty() {
+        propSaver.set(
+            MondrianProperties.instance().EnableNativeNonEmptyFun, true);
+
+        // Get a fresh connection; Otherwise the mondrian property setting
+        // is not refreshed for this parameter.
+        final boolean requestFreshConnection = true;
+
+        String query =
+            "With "
+            + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members)' "
+            + "Select "
+            + "[*NATIVE_NE_SET] on columns "
+            + "From [Sales]";
+
+        checkNative(100, 12, query, null, requestFreshConnection);
+    }
+
+    public void testNonEmptyNativeOrNot() {
+        String query =
+            "With "
+                + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members)' "
+                + "Select "
+                + "[*NATIVE_NE_SET] on columns "
+                + "From [Sales]";
+
+        verifySameNativeAndNot(query, null, getTestContext());
+    }
 }
 
 // End NonEmptyTest.java

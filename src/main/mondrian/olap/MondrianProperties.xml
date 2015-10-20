@@ -791,6 +791,16 @@ If enabled some Filter() will be computed in SQL.
         <Default>false</Default>
     </PropertyDefinition>
     <PropertyDefinition>
+        <Name>EnableNativeNonEmptyFun</Name>
+        <Path>mondrian.native.nonemptyfun.enable</Path>
+        <Category>SQL generation</Category>
+        <Description>
+            If enabled some NonEmpty() operations will be computed in SQL.
+        </Description>
+        <Type>boolean</Type>
+        <Default>false</Default>
+    </PropertyDefinition>
+    <PropertyDefinition>
         <Name>EnableNativeNonEmpty</Name>
         <Path>mondrian.native.nonempty.enable</Path>
         <Category>SQL generation</Category>
