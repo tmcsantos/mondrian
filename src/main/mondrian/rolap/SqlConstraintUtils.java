@@ -1222,7 +1222,7 @@ public class SqlConstraintUtils {
      * @return a non-empty String if SQL is generated for the multi-level
      * member list.
      */
-    private static String constrainMultiLevelMembers(
+    public static String constrainMultiLevelMembers(
         SqlQuery sqlQuery,
         RolapCube baseCube,
         AggStar aggStar,
@@ -1262,7 +1262,7 @@ public class SqlConstraintUtils {
             //   [null].[CA].[Sacramento]
             //
             // Pick out such members to generate SQL later.
-            // These members are organized in a map that maps the parant levels
+            // These members are organized in a map that maps the parent levels
             // containing NULL to all its children members in the list. e.g.
             // the member list above becomes the following map, after SQL is
             // generated for [USA].[CA].[San Jose] in the call above.
@@ -1533,7 +1533,7 @@ public class SqlConstraintUtils {
      *
      * @return string value corresponding to the member
      */
-    private static String getColumnValue(
+    public static String getColumnValue(
         Object key,
         Dialect dialect,
         Dialect.Datatype datatype)

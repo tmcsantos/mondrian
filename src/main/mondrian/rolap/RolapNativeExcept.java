@@ -1,3 +1,13 @@
+/*
+// This software is subject to the terms of the Eclipse Public License v1.0
+// Agreement, available at the following URL:
+// http://www.eclipse.org/legal/epl-v10.html.
+// You must accept the terms of that agreement to use this software.
+//
+// Copyright (C) 2005-2015 Pentaho
+// All Rights Reserved.
+*/
+
 package mondrian.rolap;
 
 import mondrian.olap.*;
@@ -6,6 +16,7 @@ import mondrian.rolap.sql.*;
 
 import javax.sql.DataSource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RolapNativeExcept extends RolapNativeSet {
 
@@ -27,7 +38,15 @@ public class RolapNativeExcept extends RolapNativeSet {
         }
 
         protected boolean isJoinRequired() {
-            return getEvaluator().isNonEmpty() && super.isJoinRequired();
+            final AtomicBoolean mustJoin = new AtomicBoolean(false);
+            for (int i = 0; i < args.length; i++) {
+                if (args[i] instanceof NonEmptyCrossJoinArg) {
+                    mustJoin.set(true);
+                    break;
+                }
+            }
+            return mustJoin.get()
+                || (getEvaluator().isNonEmpty() && super.isJoinRequired());
         }
 
         public void addConstraint(
@@ -40,20 +59,31 @@ public class RolapNativeExcept extends RolapNativeSet {
                 new RolapNativeSql(
                     sqlQuery, aggStar, getEvaluator(), args[0].getLevel());
 
+            for (CrossJoinArg arg : args) {
+                arg.addConstraint(sqlQuery, baseCube, aggStar);
+            }
+
             String filterSql = sql.generateFilterCondition(except);
             if (filterSql != null) {
                 sqlQuery.addWhere(filterSql);
             }
 
-            super.addConstraint(sqlQuery, baseCube, aggStar);
+            if (getEvaluator().isNonEmpty() || isJoinRequired()) {
+                // only apply context constraint if non empty, or
+                // if a join is required to fulfill the filter condition
+                super.addConstraint(sqlQuery, baseCube, aggStar);
+            }
         }
 
         public Object getCacheKey() {
             List<Object> key = new ArrayList<Object>();
             key.add(super.getCacheKey());
+            key.add(true); // except
+
             if (except != null) {
                 key.add(except.toString());
             }
+            key.add(getEvaluator().isNonEmpty());
 
             return key;
         }

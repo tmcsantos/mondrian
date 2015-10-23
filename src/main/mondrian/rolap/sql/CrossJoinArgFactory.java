@@ -165,6 +165,17 @@ public class CrossJoinArgFactory {
         if (allArgs != null) {
             return allArgs;
         }
+
+        allArgs = checkExcept(evaluator, fun, args);
+        if (allArgs != null) {
+            return allArgs;
+        }
+
+        allArgs = checkNonEmpty(evaluator, fun, args);
+        if (allArgs != null) {
+            return allArgs;
+        }
+
         // strip off redundant set braces, for example
         // { Gender.Gender.members }, or {{{ Gender.M }}}
         if ("{}".equalsIgnoreCase(fun.getName()) && args.length == 1) {
@@ -174,6 +185,161 @@ public class CrossJoinArgFactory {
             return checkCrossJoinArg(evaluator, args[0], returnAny);
         }
         return checkCrossJoin(evaluator, fun, args, returnAny);
+    }
+
+
+    private List<CrossJoinArg[]> checkExcept(
+        RolapEvaluator evaluator,
+        FunDef fun,
+        Exp[] args)
+    {
+        if (!MondrianProperties.instance().EnableNativeExcept.get()) {
+            return null;
+        }
+
+        // Return null if not the expected function name or input size.
+        if (!"Except".equalsIgnoreCase(fun.getName())
+            || args.length != 2)
+        {
+            return null;
+        }
+
+        // Now check args[0] can be natively evaluated.
+        // checkCrossJoin returns a list of CrossJoinArg arrays.
+        // The first array is the CrossJoin dimensions
+        // The second array, if any, contains additional constraints on the
+        // dimensions. If either the list or the first array is null, then
+        // native cross join is not feasible.
+        List<CrossJoinArg[]> allArgs =
+            checkCrossJoinArg(evaluator, args[0]);
+
+        if (allArgs == null || allArgs.isEmpty() || allArgs.get(0) == null) {
+            return null;
+        }
+
+        final CrossJoinArg[] cjArgs = allArgs.get(0);
+        if (cjArgs == null) {
+            return null;
+        }
+
+        final CrossJoinArg[] previousArgs;
+        if (allArgs.size() == 2) {
+            previousArgs = allArgs.get(1);
+        } else {
+            previousArgs = null;
+        }
+
+        Exp exceptArg = args[1];
+        Exp[] argList;
+        FunDef argFun;
+        CrossJoinArg[] exceptCJArgs;
+
+        if (exceptArg instanceof NamedSetExpr) {
+            NamedSet namedSet =
+                ((NamedSetExpr) exceptArg).getNamedSet();
+            exceptArg = namedSet.getExp();
+        }
+
+        if (!(exceptArg instanceof ResolvedFunCall)) {
+            return null;
+        }
+
+        ResolvedFunCall argCall = (ResolvedFunCall) exceptArg;
+        argFun = argCall.getFunDef();
+        argList = argCall.getArgs();
+
+        exceptCJArgs = checkEnumeration(evaluator, argFun, argList, true);
+
+        if (exceptCJArgs == null) {
+            return null;
+        }
+
+        LOGGER.debug("using native except");
+
+        CrossJoinArg[] combinedPredicateArgs = exceptCJArgs;
+
+        if (previousArgs != null) {
+            combinedPredicateArgs =
+                Util.appendArrays(previousArgs, exceptCJArgs);
+        }
+
+        // CJ args do not change.
+        // Predicate args will grow if filter is native.
+        return Arrays.asList(cjArgs, combinedPredicateArgs);
+    }
+
+    private List<CrossJoinArg[]> checkNonEmpty(
+        RolapEvaluator evaluator,
+        FunDef fun,
+        Exp[] args)
+    {
+        if (!MondrianProperties.instance().EnableNativeNonEmptyFun.get()) {
+            return null;
+        }
+
+        if (!"NonEmpty".equalsIgnoreCase(fun.getName())) {
+            return null;
+        }
+        if (args.length > 1) {
+            return null;
+        }
+
+        // Now check args[0] can be natively evaluated.
+        // checkCrossJoin returns a list of CrossJoinArg arrays.
+        // The first array is the CrossJoin dimensions
+        // The second array, if any, contains additional constraints on the
+        // dimensions. If either the list or the first array is null, then
+        // native cross join is not feasible.
+        List<CrossJoinArg[]> allArgs =
+            checkCrossJoinArg(evaluator, args[0]);
+
+        if (allArgs == null || allArgs.isEmpty() || allArgs.get(0) == null) {
+            return null;
+        }
+
+        final CrossJoinArg[] cjArgs = allArgs.get(0);
+        if (cjArgs == null) {
+            return null;
+        }
+
+        final CrossJoinArg[] previousArgs;
+        if (allArgs.size() == 2) {
+            previousArgs = allArgs.get(1);
+        } else {
+            previousArgs = null;
+        }
+
+        final Role role = evaluator.getSchemaReader().getRole();
+        final RolapLevel level = allArgs.get(0)[0].getLevel();
+        final Access access = role.getAccess(level.getHierarchy());
+
+        switch (access) {
+        case ALL:
+            break;
+        case CUSTOM:
+            final RollupPolicy rollupPolicy =
+                role.getAccessDetails(level.getHierarchy()).getRollupPolicy();
+            if (rollupPolicy == RollupPolicy.FULL) {
+                return null;
+            }
+            break;
+        default:
+            return null;
+        }
+
+        CrossJoinArg[] result = new CrossJoinArg[cjArgs.length];
+        for (int i = 0; i < cjArgs.length; i++) {
+            result[i] = new NonEmptyCrossJoinArg(cjArgs[i]);
+        }
+
+        final List<CrossJoinArg[]> list = new ArrayList<>();
+        list.add(result);
+
+        if (previousArgs != null)  {
+            list.add(previousArgs);
+        }
+
+        return list;
     }
 
     private CrossJoinArg[] checkConstrainedMeasures(
@@ -687,7 +853,7 @@ public class CrossJoinArgFactory {
             return null;
         }
 
-        // Return null if not the expected funciton name or input size.
+        // Return null if not the expected function name or input size.
         if (!"Filter".equalsIgnoreCase(fun.getName())
             || filterArgs.length != 2)
         {

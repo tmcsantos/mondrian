@@ -20,6 +20,7 @@ import mondrian.util.Bug;
 import junit.framework.Assert;
 import junit.framework.ComparisonFailure;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 
 import org.eigenbase.xom.StringEscaper;
@@ -6967,6 +6968,11 @@ public class FunctionTest extends FoodMartTestCase {
             return;
         } catch (CancellationException e) {
             return;
+        } catch (MondrianException e) {
+            Throwable root = ExceptionUtils.getRootCause(e);
+            if (root instanceof QueryTimeoutException) {
+                return;
+            }
         }
         fail("should have timed out");
     }
