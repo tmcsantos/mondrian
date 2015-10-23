@@ -13,12 +13,12 @@ package mondrian.rolap;
 import mondrian.mdx.*;
 import mondrian.olap.*;
 import mondrian.olap.type.*;
+import mondrian.rolap.agg.MemberColumnPredicate;
 import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.sql.SqlQuery;
 import mondrian.spi.Dialect;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Creates SQL from parse tree nodes. Currently it creates the SQL that
@@ -34,7 +34,6 @@ public class RolapNativeSql {
 
     CompositeSqlCompiler numericCompiler;
     CompositeSqlCompiler booleanCompiler;
-    CompositeSqlCompiler memberCompiler;
 
     RolapStoredMeasure storedMeasure;
     final AggStar aggStar;
@@ -383,6 +382,12 @@ public class RolapNativeSql {
     }
 
     class BaseMemberSqlCompiler extends MemberSqlCompiler {
+        boolean exclude;
+
+        public BaseMemberSqlCompiler(boolean exclude) {
+            this.exclude = exclude;
+        }
+
         public String compile(Exp exp) {
             exp = unwind(exp);
             if (!(exp instanceof MemberExpr)) {
@@ -398,7 +403,36 @@ public class RolapNativeSql {
             }
 
             StringBuilder buf = new StringBuilder();
-            dialect.quoteStringLiteral(buf, member.getName());
+            buf.append("(");
+
+            // Find out the first(lowest) unique parent level.
+            // Only need to compare members up to that level.
+            RolapMember m = (RolapMember) member;
+            RolapMember firstUniqueParent = m;
+            for (; firstUniqueParent != null
+                && !firstUniqueParent.getLevel().isUnique();
+                 firstUniqueParent = firstUniqueParent.getParentMember()) { }
+
+            if (firstUniqueParent != null) {
+                // There's a unique parent along the hierarchy
+                RolapMember parent =
+                    firstUniqueParent.getParentMember() != null
+                        ? firstUniqueParent.getParentMember()
+                        : firstUniqueParent;
+                RolapLevel level = parent.getLevel();
+
+                buf.append(SqlConstraintUtils.constrainMultiLevelMembers(
+                    sqlQuery,
+                    null,
+                    aggStar,
+                    Collections.singletonList(m),
+                    level,
+                    true,
+                    exclude
+                ));
+
+            }
+            buf.append(")");
             return buf.toString();
         }
 
@@ -667,15 +701,11 @@ public class RolapNativeSql {
                 return null;
             }
 
-            String sourceExp = rolapLevel.getKeyExp().getExpression(sqlQuery);
-
             StringBuilder buf = new StringBuilder();
-            buf.append(sourceExp);
-            buf.append(" not in");
             buf.append("(");
             for (int i = 0; i < args.length; i++) {
                 if (i > 0) {
-                    buf.append(", ");
+                    buf.append(" and ");
                 }
                 buf.append(args[i]);
             }
@@ -704,9 +734,6 @@ public class RolapNativeSql {
 
         numericCompiler = new CompositeSqlCompiler();
         booleanCompiler = new CompositeSqlCompiler();
-        memberCompiler = new CompositeSqlCompiler();
-
-        memberCompiler.add(new BaseMemberSqlCompiler());
         numericCompiler.add(new NumberSqlCompiler());
         numericCompiler.add(new StoredMeasureSqlCompiler());
         numericCompiler.add(new CalculatedMemberSqlCompiler(numericCompiler));
@@ -766,7 +793,8 @@ public class RolapNativeSql {
             new IifSqlCompiler(Category.Logical, booleanCompiler));
 
         booleanCompiler.add(
-            new ExceptSqlCompiler(Category.Set, memberCompiler));
+            new ExceptSqlCompiler(
+                Category.Set, new BaseMemberSqlCompiler(true)));
 
 
     }

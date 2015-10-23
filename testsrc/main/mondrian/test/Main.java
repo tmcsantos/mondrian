@@ -211,6 +211,8 @@ public class Main extends TestSuite {
             addTest(suite, DenseDoubleSegmentBodyTest.class);
             addTest(suite, DenseIntSegmentBodyTest.class);
             addTest(suite, NativeFilterMatchingTest.class);
+            addTest(suite, NativeExceptTest.class);
+            addTest(suite, NativeFilterAgainstAggTableTest.class);
             addTest(suite, RolapConnectionTest.class);
             addTest(suite, FilteredIterableTest.class);
             addTest(suite, HighDimensionsTest.class);
@@ -317,6 +319,9 @@ public class Main extends TestSuite {
             addTest(suite, RolapSchemaReaderTest.class);
             addTest(suite, RolapCubeTest.class);
             addTest(suite, RolapNativeTopCountTest.class);
+            addTest(suite, RolapNativeTopCountVersusNonNativeTest.class);
+            addTest(suite, TopCountNativeEvaluatorTest.class);
+            addTest(suite, TopCountWithTwoParamsVersusHeadTest.class);
             addTest(suite, RolapStarTest.class);
             addTest(suite, RolapSchemaPoolTest.class);
             addTest(suite, RolapSchemaPoolConcurrencyTest.class);
@@ -349,6 +354,7 @@ public class Main extends TestSuite {
             addTest(suite, MemberCacheHelperTest.class);
             addTest(suite, EffectiveMemberCacheTest.class);
             addTest(suite, SqlStatementTest.class);
+            addTest(suite, ValidMeasureFunDefTest.class);
 
             boolean testNonEmpty = isRunOnce();
             if (!MondrianProperties.instance().EnableNativeNonEmpty.get()) {

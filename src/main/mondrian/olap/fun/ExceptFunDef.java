@@ -14,6 +14,7 @@ import mondrian.calc.impl.AbstractListCalc;
 import mondrian.calc.impl.ArrayTupleList;
 import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
