@@ -4,7 +4,7 @@
 // http://www.eclipse.org/legal/epl-v10.html.
 // You must accept the terms of that agreement to use this software.
 //
-// Copyright (c) 2002-2014 Pentaho Corporation..  All rights reserved.
+// Copyright (c) 2002-2015 Pentaho Corporation..  All rights reserved.
 */
 package mondrian.rolap.agg;
 
@@ -515,11 +515,11 @@ public class SegmentBuilder {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder builder = new StringBuilder();
             builder.append("Rolling up segments with parameters: \n");
-            builder.append("keepColumns=" + keepColumns + "\n");
-            builder.append("aggregator=" + rollupAggregator + "\n");
-            builder.append("datatype=" + datatype + "\n");
+            builder.append("keepColumns=").append(keepColumns).append("\n");
+            builder.append("aggregator=").append(rollupAggregator).append("\n");
+            builder.append("datatype=").append(datatype).append("\n");
             for (Map.Entry<SegmentHeader, SegmentBody > segment : segments) {
-                builder.append(segment.getKey() + "\n");
+                builder.append(segment.getKey()).append("\n");
             }
             builder.append("AxisInfos constructed:");
             for (AxisInfo axis : axes) {
@@ -695,34 +695,44 @@ public class SegmentBuilder {
     }
 
     public static List<SegmentColumn> toConstrainedColumns(
-        StarColumnPredicate[] predicates,
-        RolapStar.Column[] baseColumns)
+        StarColumnPredicate[] predicates)
+    {
+        return toConstrainedColumns(
+            Arrays.asList(predicates));
+    }
+
+    public static List<SegmentColumn> toConstrainedColumns(
+        Collection<StarColumnPredicate> predicates)
     {
         List<SegmentColumn> ccs =
-            new ArrayList<SegmentColumn>();
-        for (int i = 0; i < predicates.length; i++) {
-            StarColumnPredicate predicate = predicates[i];
-            final List<Comparable> values =
-                new ArrayList<Comparable>();
-            predicate.values(Util.cast(values));
-            final Comparable[] valuesArray =
-                values.toArray(new Comparable[values.size()]);
-            final ArraySortedSet<Comparable> valueList;
-            if (valuesArray.length == 1 && valuesArray[0].equals(true)) {
-                valueList = null;
-            } else {
-                Arrays.sort(
-                    valuesArray,
-                    Util.SqlNullSafeComparator.instance);
-                valueList = new ArraySortedSet<Comparable>(valuesArray);
+            new ArrayList<SegmentColumn>(predicates.size());
+        for (StarColumnPredicate predicate : predicates) {
+            if (predicate instanceof LiteralStarPredicate) {
+                if (((LiteralStarPredicate) predicate).getValue()) {
+                    // no constraint for this column
+                    ccs.add(segmentColumn(predicate, null));
+                    continue;
+                }
             }
+            List<Comparable> values = new ArrayList<Comparable>();
+            predicate.values(Util.cast(values));
+            Comparable[] valuesArray =
+                values.toArray(new Comparable[values.size()]);
+            Arrays.sort(valuesArray, Util.SqlNullSafeComparator.instance);
             ccs.add(
-                new SegmentColumn(
-                    baseColumns[i].getExpression().getGenericExpression(),
-                    predicate.getConstrainedColumn().getCardinality(),
-                    valueList));
+                segmentColumn(predicate, new ArraySortedSet(valuesArray)));
         }
         return ccs;
+    }
+
+    private static SegmentColumn segmentColumn(
+        StarColumnPredicate predicate, SortedSet<Comparable> set)
+    {
+        return new SegmentColumn(
+            predicate.getConstrainedColumn()
+                .getExpression().getGenericExpression(),
+            predicate.getConstrainedColumn().getCardinality(),
+            set);
     }
 
     /**
@@ -733,12 +743,9 @@ public class SegmentBuilder {
      * a SegmentHeader.
      * @return A SegmentHeader describing the supplied Segment object.
      */
-    public static SegmentHeader toHeader(
-        Segment segment)
-    {
+    public static SegmentHeader toHeader(Segment segment) {
         final List<SegmentColumn> cc =
-            SegmentBuilder.toConstrainedColumns(
-                segment.predicates, segment.columns);
+            SegmentBuilder.toConstrainedColumns(segment.predicates);
         final List<String> cp = new ArrayList<String>();
 
         StringBuilder buf = new StringBuilder();
