@@ -11,6 +11,7 @@
 package mondrian.rolap;
 
 import mondrian.olap.*;
+import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.sql.*;
 
 import javax.sql.DataSource;
@@ -24,16 +25,39 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
     }
 
     static class NonEmptyConstraint extends SetConstraint {
+        Exp member;
 
         public NonEmptyConstraint(
             CrossJoinArg[] args,
-            RolapEvaluator evaluator)
+            RolapEvaluator evaluator,
+            Exp member)
         {
             super(args, evaluator, true);
+            this.member = member;
         }
 
         protected boolean isJoinRequired() {
             return true;
+        }
+
+        public void addConstraint(
+            SqlQuery sqlQuery,
+            RolapCube baseCube,
+            AggStar aggStar)
+        {
+            // Use aggregate table to generate filter condition
+            RolapNativeSql sql =
+                new RolapNativeSql(
+                    sqlQuery, aggStar, getEvaluator(), args[0].getLevel());
+
+            if (member != null) {
+                String filterSql = sql.generateFilterCondition(member);
+                if (filterSql != null) {
+                    sqlQuery.addHaving(filterSql);
+                }
+            }
+
+            super.addConstraint(sqlQuery, baseCube, aggStar);
         }
     }
 
@@ -59,7 +83,7 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
             return null;
         }
 
-        if (args.length > 1) {
+        if (args.length > 2) {
             return null;
         }
 
@@ -76,6 +100,10 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
             return null;
         }
 
+        if(cjArgs[0].getLevel().isAll()) {
+            return null;
+        }
+
         // extract "order by" expression
         SchemaReader schemaReader = evaluator.getSchemaReader();
         DataSource ds = schemaReader.getDataSource();
@@ -88,6 +116,8 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
         RolapNativeSql sql =
             new RolapNativeSql(
                 sqlQuery, null, evaluator, cjArgs[0].getLevel());
+
+        final Exp memberExpr = (args.length == 2) ? args[1] : null;
 
         // Check to see if evaluator contains a calculated member that can't be
         // expanded.  This is necessary due to the SqlConstraintsUtils.
@@ -130,7 +160,7 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
             }
 
             TupleConstraint constraint =
-                new NonEmptyConstraint(combinedArgs, evaluator);
+                new NonEmptyConstraint(combinedArgs, evaluator, memberExpr);
             return new SetEvaluator(cjArgs, schemaReader, constraint);
         } finally {
             evaluator.restore(savepoint);
