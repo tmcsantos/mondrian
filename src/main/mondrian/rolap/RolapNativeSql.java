@@ -627,6 +627,46 @@ public class RolapNativeSql {
         }
     }
 
+
+    /**
+     * Compiles an <code>NonEmpty(set, measure)</code>
+     * expression into SQL <code>not(measure is null)</code>
+     */
+    class NonEmptySqlCompiler implements SqlCompiler {
+        int category;
+        SqlCompiler compiler;
+
+        public NonEmptySqlCompiler(int category, SqlCompiler compiler) {
+            this.category = category;
+            this.compiler = compiler;
+        }
+
+        protected boolean match(Exp exp) {
+            if ((exp.getCategory() & category) == 0) {
+                return false;
+            }
+            if (!(exp instanceof MemberExpr)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        public String compile(Exp exp) {
+            if (!match(exp)) {
+                return null;
+            }
+
+            String expr = compiler.compile(exp);
+            if (exp == null) {
+                return null;
+            }
+
+            return "(not (" + expr + " is null))";
+        }
+
+    }
+
     /**
      * Compiles an <code>IIF(cond, val1, val2)</code> expression into SQL
      * <code>CASE WHEN cond THEN val1 ELSE val2 END</code>.
@@ -792,6 +832,8 @@ public class RolapNativeSql {
         booleanCompiler.add(
             new IifSqlCompiler(Category.Logical, booleanCompiler));
 
+        booleanCompiler.add(
+            new NonEmptySqlCompiler(Category.Member, numericCompiler));
         booleanCompiler.add(
             new ExceptSqlCompiler(
                 Category.Set, new BaseMemberSqlCompiler(true)));

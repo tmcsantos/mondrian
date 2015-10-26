@@ -2930,7 +2930,7 @@ public class FunUtil extends Util {
     /**
      * Comparator for members.
      *
-     * <p>Could genericize this to <code>class&lt;T&gt; MemorizingComparator
+     * <p>Could generalize this to <code>class&lt;T&gt; MemorizingComparator
      * implements Comparator&lt;T&gt;</code>, but not if it adds a run time
      * cost, since the comparator is at the heart of the sort algorithms.
      */

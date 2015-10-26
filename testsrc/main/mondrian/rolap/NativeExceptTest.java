@@ -82,6 +82,9 @@ public class NativeExceptTest extends BatchTestCase {
         final String query =
             "select except(time.month.members, {time.[1997].q1.[1], time.[1997].q1.[2]}) on 0 from sales";
 
+        final String sqlPgsql =
+            "select \"time_by_day\".\"the_year\" as \"c0\", \"time_by_day\".\"quarter\" as \"c1\", \"time_by_day\".\"month_of_year\" as \"c2\" from \"time_by_day\" as \"time_by_day\" where ((not ((\"time_by_day\".\"quarter\" = 'Q1' and \"time_by_day\".\"the_year\" = 1997 and \"time_by_day\".\"month_of_year\" = 1)) or ((\"time_by_day\".\"month_of_year\" is null or \"time_by_day\".\"quarter\" is null or \"time_by_day\".\"the_year\" is null) and not((\"time_by_day\".\"quarter\" = 'Q1' and \"time_by_day\".\"the_year\" = 1997 and \"time_by_day\".\"month_of_year\" = 1)))) and (not ((\"time_by_day\".\"quarter\" = 'Q1' and \"time_by_day\".\"the_year\" = 1997 and \"time_by_day\".\"month_of_year\" = 2)) or ((\"time_by_day\".\"month_of_year\" is null or \"time_by_day\".\"quarter\" is null or \"time_by_day\".\"the_year\" is null) and not((\"time_by_day\".\"quarter\" = 'Q1' and \"time_by_day\".\"the_year\" = 1997 and \"time_by_day\".\"month_of_year\" = 2)))))  group by \"time_by_day\".\"the_year\", \"time_by_day\".\"quarter\", \"time_by_day\".\"month_of_year\" order by \"time_by_day\".\"the_year\" ASC NULLS LAST, \"time_by_day\".\"quarter\" ASC NULLS LAST, \"time_by_day\".\"month_of_year\" ASC NULLS LAST";
+
         final String sqlMysql =
             "select `time_by_day`.`the_year` as `c0`, `time_by_day`.`quarter` as `c1`, `time_by_day`.`month_of_year` as `c2` from `time_by_day` as `time_by_day` where ((not ((`time_by_day`.`month_of_year`, `time_by_day`.`quarter`, `time_by_day`.`the_year`) in ((1, 'Q1', 1997))) or (`time_by_day`.`month_of_year` is null or `time_by_day`.`quarter` is null or `time_by_day`.`the_year` is null)) and (not ((`time_by_day`.`month_of_year`, `time_by_day`.`quarter`, `time_by_day`.`the_year`) in ((2, 'Q1', 1997))) or (`time_by_day`.`month_of_year` is null or `time_by_day`.`quarter` is null or `time_by_day`.`the_year` is null)))  group by `time_by_day`.`the_year`, `time_by_day`.`quarter`, `time_by_day`.`month_of_year` order by ISNULL(`time_by_day`.`the_year`) ASC, `time_by_day`.`the_year` ASC, ISNULL(`time_by_day`.`quarter`) ASC, `time_by_day`.`quarter` ASC, ISNULL(`time_by_day`.`month_of_year`) ASC, `time_by_day`.`month_of_year` ASC";
 
@@ -89,7 +92,11 @@ public class NativeExceptTest extends BatchTestCase {
             new SqlPattern(
                 Dialect.DatabaseProduct.MYSQL,
                 sqlMysql,
-                sqlMysql.length())
+                sqlMysql.length()),
+            new SqlPattern(
+                Dialect.DatabaseProduct.POSTGRESQL,
+                sqlPgsql,
+                sqlPgsql.length())
         };
 
         assertQuerySqlOrNot(
@@ -109,7 +116,7 @@ public class NativeExceptTest extends BatchTestCase {
             return;
         }
         final String sqlPgsql =
-            "select \"store\".\"store_country\" as \"c0\" from \"store\" as \"store\" where \"store\".\"store_country\" not in('Canada')  group by \"store\".\"store_country\" order by \"store\".\"store_country\" ASC NULLS LAST";
+            "select \"store\".\"store_country\" as \"c0\" from \"store\" as \"store\" where ((not ((\"store\".\"store_country\" = 'Canada')) or ((\"store\".\"store_country\" is null) and not((\"store\".\"store_country\" = 'Canada')))))  group by \"store\".\"store_country\" order by \"store\".\"store_country\" ASC NULLS LAST";
         final String sqlMysql =
             "select `store`.`store_country` as `c0` from `store` as `store` where ((not ((`store`.`store_country`) in (('Canada'))) or (`store`.`store_country` is null)))  group by `store`.`store_country` order by ISNULL(`store`.`store_country`) ASC, `store`.`store_country` ASC";
 

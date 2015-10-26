@@ -273,6 +273,26 @@ public class UdfTest extends FoodMartTestCase {
             + "Axis #2:\n");
     }
 
+    /**
+     * tests that when using NonEmpty() within LastNonEmpty()
+     * doesn't throw UnsupportedOperationException.
+     */
+    public void testLastNonEmptyUnsupportedOperationException() {
+        final String query =
+            "with\n"
+            + "member [Measures].[last] as 'Aggregate(LastNonEmpty(NonEmpty([Store].[(All)].Members), measures.[unit sales]), measures.[unit sales])'\n"
+            + "select non empty Hierarchize({[Measures].[last]}) on 0\n"
+            + "from sales";
+
+        assertQueryReturns(
+            query,
+            "Axis #0:\n"
+            + "{}\n"
+            + "Axis #1:\n"
+            + "{[Measures].[last]}\n"
+            + "Row #0: 266,773\n");
+    }
+
     public void testBadFun() {
         final TestContext tc = udfTestContext(
             "<UserDefinedFunction name=\"BadPlusOne\" className=\""

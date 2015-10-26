@@ -6218,11 +6218,51 @@ public class NonEmptyTest extends BatchTestCase {
     public void testNonEmptyNativeOrNot() {
         String query =
             "With "
-                + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members)' "
-                + "Select "
-                + "[*NATIVE_NE_SET] on columns "
-                + "From [Sales]";
+            + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members)' "
+            + "Select "
+            + "[*NATIVE_NE_SET] on columns "
+            + "From [Sales]";
 
+        verifySameNativeAndNot(query, null, getTestContext());
+    }
+
+    public void testNonEmptyFunWithMeasure() {
+        if (!MondrianProperties.instance().EnableNativeNonEmptyFun.get()) {
+            // No point testing these if the native filters
+            // are turned off.
+            return;
+        }
+
+        final String query =
+            "With\n"
+            + "Set [NE] as 'NonEmpty([Time].[Month].Members, [Measures].[Unit Sales])'\n"
+            + "select [NE] on 0\n"
+            + "from [Sales]";
+
+        final String sqlPgsql =
+            "select \"time_by_day\".\"the_year\" as \"c0\", \"time_by_day\".\"quarter\" as \"c1\", \"time_by_day\".\"month_of_year\" as \"c2\" from \"time_by_day\" as \"time_by_day\", \"sales_fact_1997\" as \"sales_fact_1997\" where \"sales_fact_1997\".\"time_id\" = \"time_by_day\".\"time_id\" group by \"time_by_day\".\"the_year\", \"time_by_day\".\"quarter\", \"time_by_day\".\"month_of_year\" having (not (sum(\"sales_fact_1997\".\"unit_sales\") is null)) order by \"time_by_day\".\"the_year\" ASC NULLS LAST, \"time_by_day\".\"quarter\" ASC NULLS LAST, \"time_by_day\".\"month_of_year\" ASC NULLS LAST";
+
+        final String sqlMysql =
+            "select `time_by_day`.`the_year` as `c0`, `time_by_day`.`quarter` as `c1`, `time_by_day`.`month_of_year` as `c2` from `time_by_day` as `time_by_day`, `sales_fact_1997` as `sales_fact_1997` where `sales_fact_1997`.`time_id` = `time_by_day`.`time_id` group by `time_by_day`.`the_year`, `time_by_day`.`quarter`, `time_by_day`.`month_of_year` having (not (sum(`sales_fact_1997`.`unit_sales`) is null)) order by ISNULL(`time_by_day`.`the_year`) ASC, `time_by_day`.`the_year` ASC, ISNULL(`time_by_day`.`quarter`) ASC, `time_by_day`.`quarter` ASC, ISNULL(`time_by_day`.`month_of_year`) ASC, `time_by_day`.`month_of_year` ASC";
+
+        SqlPattern[] patterns = {
+            new SqlPattern(
+                Dialect.DatabaseProduct.MYSQL,
+                sqlMysql,
+                sqlMysql.length()),
+            new SqlPattern(
+                Dialect.DatabaseProduct.POSTGRESQL,
+                sqlPgsql,
+                sqlPgsql.length())
+        };
+
+        assertQuerySqlOrNot(
+            getTestContext(),
+            query,
+            patterns,
+            false,
+            true,
+            true);
         verifySameNativeAndNot(query, null, getTestContext());
     }
 }

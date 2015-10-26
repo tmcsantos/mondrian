@@ -1059,6 +1059,34 @@ public class RolapCubeHierarchy extends RolapHierarchy {
                         return lookupCubeMember(
                             parent, member, (RolapCubeLevel) level);
                     }
+
+                    private RolapMember[] materialize(RolapMember[] a) {
+                        final RolapMember[] array;
+                        if (a != null && a.length == size()) {
+                            array = a;
+                        } else {
+                            //noinspection unchecked
+                            array = new RolapMember[size()];
+                        }
+                        int k = 0;
+                        for (RolapMember rolapMember : list) {
+                            array[k++] = mutate(rolapMember);
+                        }
+                        return array;
+                    }
+
+                    @Override
+                    public <S> S[] toArray(S[] a) {
+                        // Our requirements are stronger than the general toArray(T[] a)
+                        // contract. We will use the user's array 'a' only if it is PRECISELY
+                        // the right type and size; otherwise we will allocate our own array.
+                        //noinspection unchecked
+                        return (S[]) materialize((RolapMember[]) a);
+                    }
+
+                    public Object[] toArray() {
+                        return materialize(null);
+                    }
                 };
         }
 
