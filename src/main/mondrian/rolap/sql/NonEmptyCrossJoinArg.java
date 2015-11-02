@@ -48,4 +48,39 @@ public class NonEmptyCrossJoinArg implements CrossJoinArg {
     public boolean isPreferInterpreter(boolean joinArg) {
         return false;
     }
+
+    private boolean equals(Object o1, Object o2) {
+        return o1 == null ? o2 == null : o1.equals(o2);
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof NonEmptyCrossJoinArg)) {
+            return false;
+        }
+        NonEmptyCrossJoinArg that = (NonEmptyCrossJoinArg) obj;
+        if (!equals(this.level, that.level)) {
+            return false;
+        }
+
+        if (members != null && that.members != null) {
+            if (members.size() != that.members.size()) {
+                return false;
+            }
+        }
+
+        return equals(members, that.members);
+    }
+
+    public int hashCode() {
+        int c = 12;
+        if (level != null) {
+            c = level.hashCode();
+        }
+        if (members != null) {
+            for (RolapMember member : members) {
+                c = 31 * c + member.hashCode();
+            }
+        }
+        return c;
+    }
 }

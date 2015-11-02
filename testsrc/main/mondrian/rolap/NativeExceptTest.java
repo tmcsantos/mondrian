@@ -64,7 +64,7 @@ public class NativeExceptTest extends BatchTestCase {
 
         String query =
             "With \n"
-            + "Set [*NATIVE_EXCEPT] as 'Except(Cache([*NATIVE_NE_SET]), {[Time].[1997].[Q1].[1], [Time].[1997].[Q1].[2]})'\n"
+            + "Set [*NATIVE_EXCEPT] as 'Except([*NATIVE_NE_SET], {[Time].[1997].[Q1].[1], [Time].[1997].[Q1].[2]})'\n"
             + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members)'\n"
             + "Select \n"
             + "[*NATIVE_EXCEPT] on columns \n"
