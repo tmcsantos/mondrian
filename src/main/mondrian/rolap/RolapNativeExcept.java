@@ -78,7 +78,6 @@ public class RolapNativeExcept extends RolapNativeSet {
         public Object getCacheKey() {
             List<Object> key = new ArrayList<Object>();
             key.add(super.getCacheKey());
-            key.add(true); // except
 
             if (except != null) {
                 key.add(except.toString());
