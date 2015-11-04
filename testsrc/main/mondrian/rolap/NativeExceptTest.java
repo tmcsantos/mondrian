@@ -73,6 +73,28 @@ public class NativeExceptTest extends BatchTestCase {
         checkNative(100, 10, query, null, requestFreshConnection);
     }
 
+    public void testCachedExcept() {
+        propSaver.set(MondrianProperties.instance().EnableNativeExcept, true);
+        propSaver.set(
+            MondrianProperties.instance().EnableNativeNonEmptyFun, true);
+
+        // Get a fresh connection; Otherwise the mondrian property setting
+        // is not refreshed for this parameter.
+        final boolean requestFreshConnection = true;
+
+        String query =
+            "With \n"
+            + "Set [~COLUMN] as 'Crossjoin([Store].[Store Country].Members, [*NATIVE_EXCEPT])'\n"
+            + "Set [*NATIVE_EXCEPT] as 'Except([*NATIVE_NE_SET], {[Time].[1997].[Q1].[1], [Time].[1997].[Q1].[2]})'\n"
+            + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members, [Measures].[Unit Sales])'\n"
+            + "Select \n"
+            + "Non Empty [~COLUMN] on columns \n"
+            + "From [Sales]";
+
+        checkNative(100, 10, query, null, requestFreshConnection);
+        verifySameNativeAndNot(query, null, getTestContext());
+    }
+
     public void testHierarchies() throws Exception {
         if (!MondrianProperties.instance().EnableNativeExcept.get()) {
             // No point testing these if the native filters

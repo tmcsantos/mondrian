@@ -14,9 +14,6 @@ import mondrian.calc.impl.AbstractListCalc;
 import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
 import mondrian.rolap.RolapEvaluator;
-import org.apache.log4j.Logger;
-
-import java.util.*;
 
 /**
  * Definition of the <code>NonEmpty</code> MDX function.
@@ -51,42 +48,35 @@ public class NonEmptyFunDef extends FunDefBase {
             public TupleList evaluateList(Evaluator evaluator) {
                 SchemaReader schemaReader = evaluator.getSchemaReader();
 
-                final int savepoint = evaluator.savepoint();
-                try {
-                    evaluator.setNonEmpty(true);
-                    if (evaluator instanceof RolapEvaluator) {
-                        for (Member member
-                            : ((RolapEvaluator) evaluator).getSlicerMembers()) {
-                            if (getType().getElementType().usesHierarchy(
-                                member.getHierarchy(), true)) {
-                                evaluator.setContext(
-                                    member.getHierarchy().getAllMember());
-                            }
+                if (evaluator instanceof RolapEvaluator) {
+                    for (Member member
+                        : ((RolapEvaluator) evaluator).getSlicerMembers()) {
+                        if (getType().getElementType().usesHierarchy(
+                            member.getHierarchy(), true)) {
+                            evaluator.setContext(
+                                member.getHierarchy().getAllMember());
                         }
                     }
-
-                    NativeEvaluator nativeEvaluator =
-                        schemaReader.getNativeSetEvaluator(
-                            call.getFunDef(), call.getArgs(), evaluator, this);
-                    if (nativeEvaluator != null) {
-                        evaluator.restore(savepoint);
-                        return
-                            (TupleList) nativeEvaluator.execute(
-                                ResultStyle.LIST);
-                    }
-
-                    Set<Member> measureSet = new HashSet<>();
-                    if (memberCalc != null) {
-                        measureSet.add(memberCalc.evaluateMember(evaluator));
-                    }
-
-                    final TupleList list1 = listCalc.evaluateList(evaluator);
-
-                    // remove any remaining empty crossings from the result
-                    return nonEmptyList(evaluator, list1, measureSet);
-                } finally {
-                    evaluator.restore(savepoint);
                 }
+
+                NativeEvaluator nativeEvaluator =
+                    schemaReader.getNativeSetEvaluator(
+                        call.getFunDef(), call.getArgs(), evaluator, this);
+                if (nativeEvaluator != null) {
+                    return
+                        (TupleList) nativeEvaluator.execute(
+                            ResultStyle.LIST);
+                }
+
+                Member member = null;
+                if (memberCalc != null) {
+                    member = memberCalc.evaluateMember(evaluator);
+                }
+
+                final TupleList list1 = listCalc.evaluateList(evaluator);
+
+                // remove any remaining empty crossings from the result
+                return nonEmptyList(evaluator, list1, member);
             }
         };
     }
@@ -94,7 +84,7 @@ public class NonEmptyFunDef extends FunDefBase {
     protected TupleList nonEmptyList(
         Evaluator evaluator,
         TupleList list,
-        Set<Member> measureSet)
+        Member member)
     {
         if (list.isEmpty()) {
             return list;
@@ -102,14 +92,15 @@ public class NonEmptyFunDef extends FunDefBase {
 
         TupleList result =
             TupleCollections.createList(
-                list.getArity(), (list.size() + 2) >> 1);
+                list.getArity(), list.size() >> 1);
 
         final int savepoint = evaluator.savepoint();
         try {
+            evaluator.setNonEmpty(false);
             final TupleCursor cursor = list.tupleCursor();
             while (cursor.forward()) {
                 cursor.setContext(evaluator);
-                if (checkData(measureSet, evaluator)) {
+                if (checkData(member, evaluator)) {
                     result.addCurrent(cursor);
                 }
             }
@@ -120,13 +111,13 @@ public class NonEmptyFunDef extends FunDefBase {
     }
 
     private static boolean checkData(
-        Set<Member> measureSet,
+        Member member,
         Evaluator evaluator)
     {
         // no measures found, use standard algorithm
-        if (measureSet.isEmpty()) {
+        if (member == null) {
             Object value = evaluator.evaluateCurrent();
-            if (value != null
+            if (!Util.isNull(value)
                 && !(value instanceof Throwable))
             {
                 return true;
@@ -135,14 +126,12 @@ public class NonEmptyFunDef extends FunDefBase {
             // Here we evaluate across all measures just to
             // make sure that the data is all loaded
             boolean found = false;
-            for (Member measure : measureSet) {
-                evaluator.setContext(measure);
-                Object value = evaluator.evaluateCurrent();
-                if (value != null
-                    && !(value instanceof Throwable))
-                {
-                    found = true;
-                }
+            evaluator.setContext(member);
+            Object value = evaluator.evaluateCurrent();
+            if (!Util.isNull(value)
+                && !(value instanceof Throwable))
+            {
+                found = true;
             }
             return found;
         }

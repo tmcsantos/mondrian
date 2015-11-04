@@ -280,8 +280,22 @@ public class CrossJoinArgFactory {
         if (!"NonEmpty".equalsIgnoreCase(fun.getName())) {
             return null;
         }
-        if (args.length > 1) {
+        if (args.length > 2) {
             return null;
+        }
+
+        RolapMember member = null;
+        if (args.length == 2) {
+            if (!(args[1] instanceof MemberExpr)) {
+                return null;
+            }
+            member = (RolapMember) ((MemberExpr) args[1]).getMember();
+            if (!(member instanceof RolapStoredMeasure)) {
+                return null;
+            }
+            if (member.isCalculated()) {
+                return null;
+            }
         }
 
         // Now check args[0] can be natively evaluated.
@@ -298,9 +312,6 @@ public class CrossJoinArgFactory {
         }
 
         final CrossJoinArg[] cjArgs = allArgs.get(0);
-        if (cjArgs == null) {
-            return null;
-        }
 
         final CrossJoinArg[] previousArgs;
         if (allArgs.size() == 2) {
@@ -329,7 +340,7 @@ public class CrossJoinArgFactory {
 
         CrossJoinArg[] result = new CrossJoinArg[cjArgs.length];
         for (int i = 0; i < cjArgs.length; i++) {
-            result[i] = new NonEmptyCrossJoinArg(cjArgs[i]);
+            result[i] = new NonEmptyCrossJoinArg(cjArgs[i], member);
         }
 
         final List<CrossJoinArg[]> list = new ArrayList<>();

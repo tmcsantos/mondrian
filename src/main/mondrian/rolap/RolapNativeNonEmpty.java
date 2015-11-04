@@ -45,12 +45,12 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
             RolapCube baseCube,
             AggStar aggStar)
         {
-            // Use aggregate table to generate filter condition
-            RolapNativeSql sql =
-                new RolapNativeSql(
-                    sqlQuery, aggStar, getEvaluator(), args[0].getLevel());
-
             if (member != null) {
+                // Use aggregate table to generate filter condition
+                RolapNativeSql sql =
+                    new RolapNativeSql(
+                        sqlQuery, aggStar, getEvaluator(), args[0].getLevel());
+
                 String filterSql = sql.generateFilterCondition(member);
                 if (filterSql != null) {
                     sqlQuery.addHaving(filterSql);
