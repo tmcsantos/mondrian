@@ -45,12 +45,12 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
             RolapCube baseCube,
             AggStar aggStar)
         {
-            // Use aggregate table to generate filter condition
-            RolapNativeSql sql =
-                new RolapNativeSql(
-                    sqlQuery, aggStar, getEvaluator(), args[0].getLevel());
-
             if (member != null) {
+                // Use aggregate table to generate filter condition
+                RolapNativeSql sql =
+                    new RolapNativeSql(
+                        sqlQuery, aggStar, getEvaluator(), args[0].getLevel());
+
                 String filterSql = sql.generateFilterCondition(member);
                 if (filterSql != null) {
                     sqlQuery.addHaving(filterSql);
@@ -118,6 +118,12 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
                 sqlQuery, null, evaluator, cjArgs[0].getLevel());
 
         final Exp memberExpr = (args.length == 2) ? args[1] : null;
+        if (memberExpr != null) {
+            String filterExprStr = sql.generateFilterCondition(memberExpr);
+            if (filterExprStr == null) {
+                return null;
+            }
+        }
 
         // Check to see if evaluator contains a calculated member that can't be
         // expanded.  This is necessary due to the SqlConstraintsUtils.
