@@ -6240,10 +6240,10 @@ public class NonEmptyTest extends BatchTestCase {
             + "from [Sales]";
 
         final String sqlPgsql =
-            "select \"time_by_day\".\"the_year\" as \"c0\", \"time_by_day\".\"quarter\" as \"c1\", \"time_by_day\".\"month_of_year\" as \"c2\" from \"time_by_day\" as \"time_by_day\", \"sales_fact_1997\" as \"sales_fact_1997\" where \"sales_fact_1997\".\"time_id\" = \"time_by_day\".\"time_id\" and \"time_by_day\".\"the_year\" = 1997 group by \"time_by_day\".\"the_year\", \"time_by_day\".\"quarter\", \"time_by_day\".\"month_of_year\" having NOT((sum(\"sales_fact_1997\".\"unit_sales\") is null)) order by \"time_by_day\".\"the_year\" ASC NULLS LAST, \"time_by_day\".\"quarter\" ASC NULLS LAST, \"time_by_day\".\"month_of_year\" ASC NULLS LAST";
+            "select \"time_by_day\".\"the_year\" as \"c0\", \"time_by_day\".\"quarter\" as \"c1\", \"time_by_day\".\"month_of_year\" as \"c2\" from \"time_by_day\" as \"time_by_day\", \"sales_fact_1997\" as \"sales_fact_1997\" where \"sales_fact_1997\".\"time_id\" = \"time_by_day\".\"time_id\" group by \"time_by_day\".\"the_year\", \"time_by_day\".\"quarter\", \"time_by_day\".\"month_of_year\" having NOT((sum(\"sales_fact_1997\".\"unit_sales\") is null)) order by \"time_by_day\".\"the_year\" ASC NULLS LAST, \"time_by_day\".\"quarter\" ASC NULLS LAST, \"time_by_day\".\"month_of_year\" ASC NULLS LAST";
 
         final String sqlMysql =
-            "select `time_by_day`.`the_year` as `c0`, `time_by_day`.`quarter` as `c1`, `time_by_day`.`month_of_year` as `c2` from `time_by_day` as `time_by_day`, `sales_fact_1997` as `sales_fact_1997` where `sales_fact_1997`.`time_id` = `time_by_day`.`time_id` and `time_by_day`.`the_year` = 1997 group by `time_by_day`.`the_year`, `time_by_day`.`quarter`, `time_by_day`.`month_of_year` having NOT((sum(`sales_fact_1997`.`unit_sales`) is null)) order by ISNULL(`time_by_day`.`the_year`) ASC, `time_by_day`.`the_year` ASC, ISNULL(`time_by_day`.`quarter`) ASC, `time_by_day`.`quarter` ASC, ISNULL(`time_by_day`.`month_of_year`) ASC, `time_by_day`.`month_of_year` ASC";
+            "select `time_by_day`.`the_year` as `c0`, `time_by_day`.`quarter` as `c1`, `time_by_day`.`month_of_year` as `c2` from `time_by_day` as `time_by_day`, `sales_fact_1997` as `sales_fact_1997` where `sales_fact_1997`.`time_id` = `time_by_day`.`time_id` group by `time_by_day`.`the_year`, `time_by_day`.`quarter`, `time_by_day`.`month_of_year` having NOT((sum(`sales_fact_1997`.`unit_sales`) is null)) order by ISNULL(`time_by_day`.`the_year`) ASC, `time_by_day`.`the_year` ASC, ISNULL(`time_by_day`.`quarter`) ASC, `time_by_day`.`quarter` ASC, ISNULL(`time_by_day`.`month_of_year`) ASC, `time_by_day`.`month_of_year` ASC";
 
         SqlPattern[] patterns = {
             new SqlPattern(
@@ -6277,6 +6277,22 @@ public class NonEmptyTest extends BatchTestCase {
             "select non empty crossjoin(store.[store country].members, NonEmpty([Time].[Month].members, [Measures].[Unit Sales])) on 0 from sales";
 
         checkNative(100, 12, query, null, true);
+    }
+
+    public void testNESlicerContext() {
+        if (!MondrianProperties.instance().EnableNativeNonEmptyFun.get()) {
+            // No point testing these if the native filters
+            // are turned off.
+            return;
+        }
+
+        final String query =
+            "with\n"
+            + "set [a] as 'NonEmpty([time.weekly].week.members, [Measures].[unit sales])'\n"
+            + "select [a] on 0 from sales\n"
+            + "where {[time].[1997].[Q4].[12]}";
+
+        checkNative(100, 6, query, null, true);
     }
 }
 

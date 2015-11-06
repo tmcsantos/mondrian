@@ -118,6 +118,12 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
                 sqlQuery, null, evaluator, cjArgs[0].getLevel());
 
         final Exp memberExpr = (args.length == 2) ? args[1] : null;
+        if (memberExpr != null) {
+            String filterExprStr = sql.generateFilterCondition(memberExpr);
+            if (filterExprStr == null) {
+                return null;
+            }
+        }
 
         // Check to see if evaluator contains a calculated member that can't be
         // expanded.  This is necessary due to the SqlConstraintsUtils.
