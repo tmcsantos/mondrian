@@ -313,15 +313,15 @@ public class CrossJoinArgFactory {
 
         final CrossJoinArg[] cjArgs = allArgs.get(0);
 
-        final CrossJoinArg[] previousArgs;
+        final CrossJoinArg[] previousPredicateArgs;
         if (allArgs.size() == 2) {
-            previousArgs = allArgs.get(1);
+            previousPredicateArgs = allArgs.get(1);
         } else {
-            previousArgs = null;
+            previousPredicateArgs = null;
         }
 
         final Role role = evaluator.getSchemaReader().getRole();
-        final RolapLevel level = allArgs.get(0)[0].getLevel();
+        final RolapLevel level = cjArgs[0].getLevel();
         final Access access = role.getAccess(level.getHierarchy());
 
         switch (access) {
@@ -343,14 +343,42 @@ public class CrossJoinArgFactory {
             result[i] = new NonEmptyCrossJoinArg(cjArgs[i], member);
         }
 
-        final List<CrossJoinArg[]> list = new ArrayList<>();
-        list.add(result);
+        CrossJoinArg[] combinedPredicateArgs =
+            previousPredicateArgs;
 
-        if (previousArgs != null)  {
-            list.add(previousArgs);
+        if (member != null && !evaluator.getSlicerMembers().isEmpty()) {
+            List<RolapMember> members = new ArrayList<>();
+            for (Member member1 : evaluator.getSlicerMembers()) {
+                members.add((RolapMember) member1);
+            }
+            final CrossJoinArg cjArg =
+                MemberListCrossJoinArg.create(
+                    evaluator,
+                    members,
+                    restrictMemberTypes(),
+                    false);
+            if (cjArg == null) {
+                return null;
+            }
+            if (previousPredicateArgs != null) {
+                combinedPredicateArgs =
+                    Util.appendArrays(
+                        previousPredicateArgs,
+                        new CrossJoinArg[]{cjArg});
+            } else {
+                combinedPredicateArgs =
+                    new CrossJoinArg[]{cjArg};
+            }
         }
 
-        return list;
+        LOGGER.debug("using native NonEmpty()");
+        List<CrossJoinArg[]> nonEmptyAllArgs = new ArrayList<>();
+        nonEmptyAllArgs.add(result);
+        if (combinedPredicateArgs != null) {
+            nonEmptyAllArgs.add(combinedPredicateArgs);
+        }
+
+        return nonEmptyAllArgs;
     }
 
     private CrossJoinArg[] checkConstrainedMeasures(
@@ -885,9 +913,6 @@ public class CrossJoinArgFactory {
         }
 
         final CrossJoinArg[] cjArgs = allArgs.get(0);
-        if (cjArgs == null) {
-            return null;
-        }
 
         final CrossJoinArg[] previousPredicateArgs;
         if (allArgs.size() == 2) {

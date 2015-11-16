@@ -22,6 +22,7 @@ import java.util.*;
  * Definition of the <code>Except</code> MDX function.
  *
  * @author jhyde
+ * @author tsantos
  * @since Mar 23, 2006
  */
 class ExceptFunDef extends FunDefBase {
@@ -71,6 +72,10 @@ class ExceptFunDef extends FunDefBase {
                     }
                 }
                 return result;
+            }
+
+            public boolean dependsOn(Hierarchy hierarchy) {
+                return butDepends(getCalcs(), hierarchy);
             }
         };
     }

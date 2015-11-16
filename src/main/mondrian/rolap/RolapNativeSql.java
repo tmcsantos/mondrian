@@ -668,6 +668,9 @@ public class RolapNativeSql {
             if (measure.isCalculated()) {
                 return false;
             }
+            if (!saveStoredMeasure(measure)) {
+                return false;
+            }
 
             return true;
         }
