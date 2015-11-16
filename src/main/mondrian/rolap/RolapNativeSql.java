@@ -13,7 +13,6 @@ package mondrian.rolap;
 import mondrian.mdx.*;
 import mondrian.olap.*;
 import mondrian.olap.type.*;
-import mondrian.rolap.agg.MemberColumnPredicate;
 import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.sql.SqlQuery;
 import mondrian.spi.Dialect;
@@ -649,6 +648,18 @@ public class RolapNativeSql {
                 return false;
             }
 
+            final Member member = ((MemberExpr) exp).getMember();
+            if (!(member instanceof RolapStoredMeasure)) {
+                return false;
+            }
+            RolapStoredMeasure measure = (RolapStoredMeasure) member;
+            if (measure.isCalculated()) {
+                return false;
+            }
+            if (!saveStoredMeasure(measure)) {
+                return false;
+            }
+
             return true;
         }
 
@@ -662,7 +673,7 @@ public class RolapNativeSql {
                 return null;
             }
 
-            return "(not (" + expr + " is null))";
+            return "NOT((" + expr + " is null))";
         }
 
     }

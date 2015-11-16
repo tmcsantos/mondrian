@@ -53,7 +53,27 @@ public class NativeExceptTest extends BatchTestCase {
         checkNative(100, 22, query, null, requestFreshConnection);
     }
 
-    public void testNativeExceptWithNE() {
+        public void testNativeExceptWithNE() {
+            propSaver.set(MondrianProperties.instance().EnableNativeExcept, true);
+            propSaver.set(
+                MondrianProperties.instance().EnableNativeNonEmptyFun, true);
+
+            // Get a fresh connection; Otherwise the mondrian property setting
+            // is not refreshed for this parameter.
+            final boolean requestFreshConnection = true;
+
+            String query =
+                "With \n"
+                + "Set [*NATIVE_EXCEPT] as 'Except([*NATIVE_NE_SET], {[Time].[1997].[Q1].[1], [Time].[1997].[Q1].[2]})'\n"
+                + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members)'\n"
+                + "Select \n"
+                + "[*NATIVE_EXCEPT] on columns \n"
+                + "From [Sales]";
+
+            checkNative(100, 10, query, null, requestFreshConnection);
+        }
+
+    public void testCachedExcept() {
         propSaver.set(MondrianProperties.instance().EnableNativeExcept, true);
         propSaver.set(
             MondrianProperties.instance().EnableNativeNonEmptyFun, true);
@@ -64,13 +84,15 @@ public class NativeExceptTest extends BatchTestCase {
 
         String query =
             "With \n"
+            + "Set [~COLUMN] as 'Crossjoin([Store].[Store Country].Members, [*NATIVE_EXCEPT])'\n"
             + "Set [*NATIVE_EXCEPT] as 'Except([*NATIVE_NE_SET], {[Time].[1997].[Q1].[1], [Time].[1997].[Q1].[2]})'\n"
-            + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members)'\n"
+            + "Set [*NATIVE_NE_SET] as 'NonEmpty([Time].[Month].members, [Measures].[Unit Sales])'\n"
             + "Select \n"
-            + "[*NATIVE_EXCEPT] on columns \n"
+            + "Non Empty [~COLUMN] on columns \n"
             + "From [Sales]";
 
         checkNative(100, 10, query, null, requestFreshConnection);
+        verifySameNativeAndNot(query, null, getTestContext());
     }
 
     public void testHierarchies() throws Exception {
@@ -109,7 +131,7 @@ public class NativeExceptTest extends BatchTestCase {
         verifySameNativeAndNot(query, "with hierarchies", getTestContext());
     }
 
-    public void testPositiveMatching() throws Exception {
+    public void testExceptSQLConstraints() throws Exception {
         if (!MondrianProperties.instance().EnableNativeExcept.get()) {
             // No point testing these if the native filters
             // are turned off.
@@ -130,14 +152,6 @@ public class NativeExceptTest extends BatchTestCase {
                 sqlPgsql,
                 sqlPgsql.length())
         };
-        final String queryResults =
-            "Axis #0:\n"
-            + "{}\n"
-            + "Axis #1:\n"
-            + "{[Store].[Mexico], [Measures].[Unit Sales]}\n"
-            + "{[Store].[USA], [Measures].[Unit Sales]}\n"
-            + "Row #0: \n"
-            + "Row #0: 266,773\n";
         final String query =
             "select crossjoin(except(store.[Store Country].members, {[Store].[Canada]}), measures.[Unit Sales]) on 0 from sales";
         assertQuerySqlOrNot(
@@ -147,9 +161,6 @@ public class NativeExceptTest extends BatchTestCase {
             false,
             true,
             true);
-        assertQueryReturns(
-            query,
-            queryResults);
         verifySameNativeAndNot(query, null, getTestContext());
     }
 
@@ -169,6 +180,43 @@ public class NativeExceptTest extends BatchTestCase {
             "select Except([Store].[Store Name].Members, {[Store].[Canada].[BC].[Vancouver].[Store 19],[Store].[Mexico].[DF].[Mexico City].[Store 9]}) "
             + " on 0 from sales",
             "Except.", getTestContext());
+    }
+
+    public void testNativeExceptWithSlicers() {
+        if (!MondrianProperties.instance().EnableNativeExcept.get()) {
+            // No point testing these if the native filters
+            // are turned off.
+            return;
+        }
+//        final String sqlPgsql =
+//            "select \"store\".\"store_country\" as \"c0\" from \"store\" as \"store\" where ((not ((\"store\".\"store_country\" = 'Canada')) or ((\"store\".\"store_country\" is null) and not((\"store\".\"store_country\" = 'Canada')))))  group by \"store\".\"store_country\" order by \"store\".\"store_country\" ASC NULLS LAST";
+        final String sqlMysql =
+            "select `time_by_day`.`the_year` as `c0`, `time_by_day`.`quarter` as `c1`, `time_by_day`.`month_of_year` as `c2` from `time_by_day` as `time_by_day`, `sales_fact_1997` as `sales_fact_1997` where `sales_fact_1997`.`time_id` = `time_by_day`.`time_id` and (`time_by_day`.`week_of_year` in (1, 2) and `time_by_day`.`the_year` = 1997) and ((not ((`time_by_day`.`month_of_year`, `time_by_day`.`quarter`, `time_by_day`.`the_year`) in ((1, 'Q1', 1997))) or (`time_by_day`.`month_of_year` is null or `time_by_day`.`quarter` is null or `time_by_day`.`the_year` is null)))  and `time_by_day`.`the_year` = 1997 group by `time_by_day`.`the_year`, `time_by_day`.`quarter`, `time_by_day`.`month_of_year` having NOT((sum(`sales_fact_1997`.`unit_sales`) is null)) order by ISNULL(`time_by_day`.`the_year`) ASC, `time_by_day`.`the_year` ASC, ISNULL(`time_by_day`.`quarter`) ASC, `time_by_day`.`quarter` ASC, ISNULL(`time_by_day`.`month_of_year`) ASC, `time_by_day`.`month_of_year` ASC";
+
+        SqlPattern[] patterns = {
+            new SqlPattern(
+                Dialect.DatabaseProduct.MYSQL,
+                sqlMysql,
+                sqlMysql.length())
+//            , new SqlPattern(
+//                Dialect.DatabaseProduct.POSTGRESQL,
+//                sqlPgsql,
+//                sqlPgsql.length())
+        };
+        String query =
+            "select \n"
+            + "except(nonempty(time.month.members, measures.[unit sales]), {time.[1997].[q1].[1]}) on 0 \n"
+            + "from sales\n"
+            + "where {[time.weekly].[1997].[1], [time.weekly].[1997].[2]}";
+
+        assertQuerySqlOrNot(
+            getTestContext(),
+            query,
+            patterns,
+            false,
+            true,
+            true);
+        verifySameNativeAndNot(query, null, getTestContext());
     }
 
     public void testWithAccessControl() {
