@@ -10,11 +10,12 @@
 */
 package mondrian.rolap;
 
-import mondrian.olap.Member;
+import mondrian.olap.*;
 import mondrian.olap.fun.VisualTotalsFunDef;
 import mondrian.rolap.agg.OrPredicate;
 import mondrian.rolap.agg.ValueColumnPredicate;
 import mondrian.rolap.sql.SqlQuery;
+import mondrian.server.*;
 import mondrian.util.Pair;
 
 import java.util.*;
@@ -283,13 +284,21 @@ public class CompoundPredicateInfo {
     {
         List<StarPredicate> compoundPredicateList =
             new ArrayList<StarPredicate> ();
+        Execution execution = Locus.peek().execution;
+        final int checkCancelPeriod =
+            MondrianProperties.instance().CancelPhaseInterval.get();
         for (List<RolapCubeMember[]> group : compoundGroupMap.values()) {
             // e.g {[USA].[CA], [Canada].[BC]}
             StarPredicate compoundGroupPredicate = null;
+            int rowCount = -1;
             for (RolapCubeMember[] tuple : group) {
                 // [USA].[CA]
                 StarPredicate tuplePredicate = null;
-
+                if (checkCancelPeriod > 0
+                    && Util.modulo(rowCount, checkCancelPeriod) == 0)
+                {
+                    execution.checkCancelOrTimeout();
+                }
                 for (RolapCubeMember member : tuple) {
                     tuplePredicate = makeCompoundPredicateForMember(
                         member, baseCube, tuplePredicate);

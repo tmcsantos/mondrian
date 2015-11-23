@@ -18,7 +18,7 @@ import mondrian.calc.TupleList;
 import mondrian.calc.impl.DelegatingTupleList;
 import mondrian.olap.*;
 import mondrian.olap.fun.*;
-import mondrian.server.Statement;
+import mondrian.server.*;
 import mondrian.spi.Dialect;
 import mondrian.util.*;
 
@@ -86,6 +86,7 @@ public class RolapEvaluator implements Evaluator {
 
     private final RolapCalculation[] calculations;
     private int calculationCount;
+    private final int checkCancelPeriod;
 
     /**
      * List of lists of tuples or members, rarely used, but overrides the
@@ -151,6 +152,8 @@ public class RolapEvaluator implements Evaluator {
         this.root = root;
         assert parent != null;
         this.parent = parent;
+        this.checkCancelPeriod =
+                MondrianProperties.instance().CancelPhaseInterval.get();
 
         ancestorCommandCount =
             parent.ancestorCommandCount + parent.commandCount;
@@ -210,6 +213,8 @@ public class RolapEvaluator implements Evaluator {
         this.iterationLength = 1;
         this.root = root;
         this.parent = null;
+        this.checkCancelPeriod =
+                MondrianProperties.instance().CancelPhaseInterval.get();
         ancestorCommandCount = 0;
         nonEmpty = false;
         nativeEnabled =
@@ -582,8 +587,16 @@ public class RolapEvaluator implements Evaluator {
             return null;
         }
         int toRemove = 0;
+        int size = slicerTuples.get(0).size();
+        int rowCount = -1;
         boolean removeMember[] = new boolean[slicerTuples.getArity()];
-        for (int i = 0; i < slicerTuples.get(0).size(); i++) {
+        for (int i = 0; i < size; i++) {
+            rowCount++;
+            if (checkCancelPeriod > 0
+                && Util.modulo(rowCount, checkCancelPeriod) == 0)
+            {
+                root.execution.checkCancelOrTimeout();
+            }
             Hierarchy h = slicerTuples.get(0).get(i).getHierarchy();
             // check to see if the current member is overridden
             // and not expanding.

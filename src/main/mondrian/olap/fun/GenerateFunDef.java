@@ -14,7 +14,7 @@ import mondrian.calc.impl.*;
 import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
 import mondrian.olap.type.*;
-import mondrian.server.Locus;
+import mondrian.server.*;
 
 import java.util.*;
 
@@ -116,12 +116,13 @@ class GenerateFunDef extends FunDefBase {
                 if (all) {
                     final TupleCursor cursor = iterable1.tupleCursor();
                     int rowCount = -1;
+                    Execution execution = Locus.peek().execution;
                     while (cursor.forward()) {
                         rowCount++;
                         if (checkCancelPeriod > 0
-                            && rowCount % checkCancelPeriod == 0)
+                            && Util.modulo(rowCount, checkCancelPeriod) == 0)
                         {
-                            Locus.peek().execution.checkCancelOrTimeout();
+                            execution.checkCancelOrTimeout();
                         }
                         cursor.setContext(evaluator);
                         final TupleList result2 =
@@ -132,14 +133,15 @@ class GenerateFunDef extends FunDefBase {
                     final Set<List<Member>> emitted =
                             new HashSet<List<Member>>();
                     final TupleCursor cursor = iterable1.tupleCursor();
+                    Execution execution = Locus.peek().execution;
 
                     int rowCount = -1;
                     while (cursor.forward()) {
                         rowCount++;
                         if (checkCancelPeriod > 0
-                            && rowCount % checkCancelPeriod == 0)
+                            && Util.modulo(rowCount, checkCancelPeriod) == 0)
                         {
-                            Locus.peek().execution.checkCancelOrTimeout();
+                            execution.checkCancelOrTimeout();
                         }
                         cursor.setContext(evaluator);
                         final TupleList result2 =
