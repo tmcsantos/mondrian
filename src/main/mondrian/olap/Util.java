@@ -140,6 +140,27 @@ public class Util extends XOMUtil {
         return o == null || o == nullValue;
     }
 
+    public static int nextHighestPowerOfTwo(int v) {
+        v--;
+        v |= v >> 1;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+        return ++v;
+    }
+
+    public static int fastModulo(int n, int d) {
+        return n & (d - 1);
+    }
+
+    public static int modulo(int n, int d) {
+        if (d == nextHighestPowerOfTwo(d)) {
+            return fastModulo(n, d);
+        }
+        return n % d;
+    }
+
     /**
      * Returns whether a list is strictly sorted.
      *

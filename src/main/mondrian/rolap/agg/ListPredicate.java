@@ -9,7 +9,7 @@
 
 package mondrian.rolap.agg;
 
-import mondrian.olap.Util;
+import mondrian.olap.*;
 import mondrian.rolap.*;
 import mondrian.rolap.sql.SqlQuery;
 
@@ -45,14 +45,16 @@ public abstract class ListPredicate implements StarPredicate {
     protected ListPredicate(List<StarPredicate> predicateList) {
         childrenHashMap = null;
         hashValue = 0;
-        // Ensure that columns are sorted by bit-key, for determinacy.
-        final SortedSet<RolapStar.Column> columnSet =
-            new TreeSet<RolapStar.Column>(RolapStar.Column.COMPARATOR);
+        final Set<RolapStar.Column> columnSet = new HashSet<>();
         for (StarPredicate predicate : predicateList) {
             children.add(predicate);
             columnSet.addAll(predicate.getConstrainedColumnList());
         }
-        columns = new ArrayList<RolapStar.Column>(columnSet);
+        // Ensure that columns are sorted by bit-key, for determinacy.
+        RolapStar.Column[] cc = new RolapStar.Column[columnSet.size()];
+        Arrays.sort(columnSet.toArray(cc), RolapStar.Column.COMPARATOR);
+        columns = new ArrayList<RolapStar.Column>();
+        Collections.addAll(columns, cc);
     }
 
     public List<RolapStar.Column> getConstrainedColumnList() {

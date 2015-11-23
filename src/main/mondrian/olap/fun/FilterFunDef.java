@@ -13,7 +13,7 @@ import mondrian.calc.*;
 import mondrian.calc.impl.*;
 import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
-import mondrian.server.Locus;
+import mondrian.server.*;
 
 import java.util.List;
 
@@ -233,13 +233,14 @@ class FilterFunDef extends FunDefBase {
                             if (Locus.isEmpty()) {
                                 return false;
                             }
+                            Execution execution = Locus.peek().execution;
                             while (cursor.forward()) {
                                 rowCount++;
                                 if (checkCancelPeriod > 0
-                                    && rowCount % checkCancelPeriod == 0)
+                                    && Util.modulo(
+                                    rowCount, checkCancelPeriod) == 0)
                                 {
-                                    Locus.peek().execution
-                                        .checkCancelOrTimeout();
+                                    execution.checkCancelOrTimeout();
                                 }
                                 cursor.setContext(evaluator2);
                                 if (bcalc.evaluateBoolean(evaluator2)) {

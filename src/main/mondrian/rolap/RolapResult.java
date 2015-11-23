@@ -1612,7 +1612,7 @@ public class RolapResult extends ResultBase {
             for (int i = 0; i < arity; i++) {
                 rowCount++;
                 if (checkCancelPeriod > 0
-                    && rowCount % checkCancelPeriod == 0)
+                    && Util.modulo(rowCount, checkCancelPeriod) == 0)
                 {
                     execution.checkCancelOrTimeout();
                 }

@@ -17,7 +17,7 @@ import mondrian.rolap.agg.AggregationManager;
 import mondrian.rolap.agg.CellRequest;
 import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.sql.*;
-import mondrian.server.Locus;
+import mondrian.server.*;
 import mondrian.server.monitor.SqlStatementEvent;
 import mondrian.spi.Dialect;
 import mondrian.util.*;
@@ -340,6 +340,7 @@ class SqlMemberSource
             final int checkCancelPeriod =
                 MondrianProperties.instance().CancelPhaseInterval.get();
             ResultSet resultSet = stmt.getResultSet();
+            Execution execution = Locus.peek().execution;
             while (resultSet.next()) {
                 ++stmt.rowCount;
                 if (limit > 0 && limit < stmt.rowCount) {
@@ -351,9 +352,9 @@ class SqlMemberSource
 
                 // Check if the MDX query was canceled.
                 if (checkCancelPeriod > 0
-                    && stmt.rowCount % checkCancelPeriod == 0)
+                    && Util.modulo(stmt.rowCount, checkCancelPeriod) == 0)
                 {
-                    Locus.peek().execution.checkCancelOrTimeout();
+                    execution.checkCancelOrTimeout();
                 }
 
                 int column = 0;
@@ -980,6 +981,7 @@ RME is this right
             final List<SqlStatement.Accessor> accessors = stmt.getAccessors();
             ResultSet resultSet = stmt.getResultSet();
             RolapMember parentMember2 = RolapUtil.strip(parentMember);
+            Execution execution = Locus.peek().execution;
             while (resultSet.next()) {
                 ++stmt.rowCount;
                 if (limit > 0 && limit < stmt.rowCount) {
@@ -990,9 +992,9 @@ RME is this right
 
                 // Check if the MDX query was canceled.
                 if (checkCancelPeriod > 0
-                    && stmt.rowCount % checkCancelPeriod == 0)
+                    && Util.modulo(stmt.rowCount, checkCancelPeriod) == 0)
                 {
-                    Locus.peek().execution.checkCancelOrTimeout();
+                    execution.checkCancelOrTimeout();
                 }
 
                 Object value = accessors.get(0).get();
