@@ -143,7 +143,8 @@ public class Execution {
                 ? this.startTimeMillis + timeoutIntervalMillis
                 : 0L;
         this.state = State.RUNNING;
-        this.queryTiming.init(true);
+        this.queryTiming.init(
+            MondrianProperties.instance().EnableQueryTiming.get());
         fireExecutionStartEvent();
     }
 
