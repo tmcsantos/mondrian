@@ -21,7 +21,7 @@ import mondrian.rolap.agg.AggregationManager;
 import mondrian.rolap.agg.CellRequest;
 import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.sql.*;
-import mondrian.server.Locus;
+import mondrian.server.*;
 import mondrian.server.monitor.SqlStatementEvent;
 import mondrian.util.Pair;
 
@@ -436,6 +436,7 @@ public class SqlTupleReader implements TupleReader {
             } else {
                 moreRows = currPartialResultIdx < partialResult.size();
             }
+            Execution execution = Locus.peek().execution;
             while (moreRows) {
                 if (limit > 0 && limit < ++fetchCount) {
                     // result limit exceeded, throw an exception
@@ -445,9 +446,9 @@ public class SqlTupleReader implements TupleReader {
 
                 // Check if the MDX query was canceled.
                 if (checkCancelPeriod > 0
-                    && stmt.rowCount % checkCancelPeriod == 0)
+                    && Util.modulo(stmt.rowCount, checkCancelPeriod) == 0)
                 {
-                    Locus.peek().execution.checkCancelOrTimeout();
+                    execution.checkCancelOrTimeout();
                 }
 
                 if (enumTargetCount == 0) {

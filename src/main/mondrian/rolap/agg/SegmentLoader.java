@@ -17,7 +17,7 @@ import mondrian.resource.MondrianResource;
 import mondrian.rolap.*;
 import mondrian.rolap.agg.SegmentCacheManager.AbortException;
 import mondrian.rolap.cache.SegmentCacheIndex;
-import mondrian.server.Locus;
+import mondrian.server.*;
 import mondrian.server.monitor.SqlStatementEvent;
 import mondrian.spi.*;
 import mondrian.util.*;
@@ -677,14 +677,15 @@ public class SegmentLoader {
         final int checkCancelPeriod =
             MondrianProperties.instance().CancelPhaseInterval.get();
 
+        Execution execution = Locus.peek().execution;
         while (rawRows.next()) {
             checkResultLimit(++stmt.rowCount);
             processedRows.createRow();
             // Check if the MDX query was canceled.
             if (checkCancelPeriod > 0
-                && stmt.rowCount % checkCancelPeriod == 0)
+                && Util.modulo(stmt.rowCount, checkCancelPeriod) == 0)
             {
-                Locus.peek().execution.checkCancelOrTimeout();
+                execution.checkCancelOrTimeout();
             }
 
             // get the columns

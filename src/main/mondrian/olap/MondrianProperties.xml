@@ -1069,7 +1069,7 @@ setting it too high can cause a big delay between the query being marked as canc
 </p>
         </Description>
         <Type>int</Type>
-        <Default>10000</Default>
+        <Default>2048</Default>
     </PropertyDefinition>
     <PropertyDefinition>
         <Name>ExecutionHistorySize</Name>
