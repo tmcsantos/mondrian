@@ -146,7 +146,6 @@ class TopBottomCountFunDef extends FunDefBase {
 
                 // normal case: no need for chunks
                 final int savepoint = evaluator.savepoint();
-                evaluator.setNativeEnabled(false);
                 try {
                     switch (list.getArity()) {
                     case 1:
