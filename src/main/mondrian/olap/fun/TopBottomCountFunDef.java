@@ -5,7 +5,7 @@
 // You must accept the terms of that agreement to use this software.
 //
 // Copyright (C) 2002-2005 Julian Hyde
-// Copyright (C) 2005-2012 Pentaho and others
+// Copyright (C) 2005-2015 Pentaho and others
 // All Rights Reserved.
 */
 
@@ -91,24 +91,31 @@ class TopBottomCountFunDef extends FunDefBase {
                     return TupleCollections.emptyList(arity);
                 }
 
-                TupleList list = listCalc.evaluateList(evaluator);
-                assert list.getArity() == arity;
-                if (list.isEmpty()) {
-                    return list;
-                }
-
-                if (orderCalc == null) {
-                    // REVIEW: Why require "instanceof AbstractList"?
-                    if (list instanceof AbstractList && list.size() <= n) {
+                final int savepoint = evaluator.savepoint();
+                evaluator.setNativeEnabled(false);
+                try {
+                    TupleList list = listCalc.evaluateList(evaluator);
+                    assert list.getArity() == arity;
+                    if (list.isEmpty()) {
                         return list;
-                    } else {
-                        return list.subList(0, n);
                     }
-                }
 
-                return partiallySortList(
-                    evaluator, list, hasHighCardDimension(list),
-                    Math.min(n, list.size()));
+
+                    if (orderCalc == null) {
+                        // REVIEW: Why require "instanceof AbstractList"?
+                        if (list instanceof AbstractList && list.size() <= n) {
+                            return list;
+                        } else {
+                            return list.subList(0, n);
+                        }
+                    }
+
+                    return partiallySortList(
+                        evaluator, list, hasHighCardDimension(list),
+                        Math.min(n, list.size()));
+                } finally {
+                    evaluator.restore(savepoint);
+                }
             }
 
             private TupleList partiallySortList(
