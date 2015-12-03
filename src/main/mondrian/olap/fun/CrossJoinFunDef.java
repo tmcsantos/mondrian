@@ -17,6 +17,7 @@ import mondrian.olap.*;
 import mondrian.olap.type.*;
 import mondrian.resource.MondrianResource;
 import mondrian.rolap.RolapEvaluator;
+import mondrian.server.*;
 import mondrian.util.CartesianProductList;
 
 import org.apache.log4j.Logger;
@@ -925,6 +926,8 @@ public class CrossJoinFunDef extends FunDefBase {
         // Determine if there is any data.
         //
         // Put all of the All Members into Evaluator
+        final int checkCancelPeriod =
+            MondrianProperties.instance().CancelPhaseInterval.get();
         final int savepoint = evaluator.savepoint();
         try {
             evaluator.setContext(allMemberList);
@@ -933,7 +936,15 @@ public class CrossJoinFunDef extends FunDefBase {
             // Measure and non-All Members evaluation is non-null, then
             // add it to the result List.
             final TupleCursor cursor = list.tupleCursor();
+            int rowCount = -1;
+            Execution execution = Locus.peek().execution;
             while (cursor.forward()) {
+                rowCount++;
+                if (checkCancelPeriod > 0
+                    && Util.modulo(rowCount, checkCancelPeriod) == 0)
+                {
+                    execution.checkCancelOrTimeout();
+                }
                 cursor.setContext(evaluator);
                 for (Member member : memberSet) {
                     // memberSet contains members referenced within measures.
