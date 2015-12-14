@@ -30,7 +30,7 @@ will probably reduce long before you get to their limit.</p>
         <Name>EnableQueryTiming</Name>
         <Path>mondrian.query.timing</Path>
         <Description>
-            <p>Maximum number of simultaneous queries the system will allow.</p>
+            <p>Property to enable query statistics.</p>
         </Description>
         <Type>boolean</Type>
         <Default>true</Default>
