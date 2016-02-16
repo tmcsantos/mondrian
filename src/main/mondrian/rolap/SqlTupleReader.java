@@ -23,7 +23,7 @@ import mondrian.rolap.aggmatcher.AggStar;
 import mondrian.rolap.sql.*;
 import mondrian.server.*;
 import mondrian.server.monitor.SqlStatementEvent;
-import mondrian.util.Pair;
+import mondrian.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -425,8 +425,6 @@ public class SqlTupleReader implements TupleReader {
             }
 
             int limit = MondrianProperties.instance().ResultLimit.get();
-            final int checkCancelPeriod =
-                MondrianProperties.instance().CancelPhaseInterval.get();
             int fetchCount = 0;
 
             // determine how many enum targets we have
@@ -448,17 +446,14 @@ public class SqlTupleReader implements TupleReader {
             }
             Execution execution = Locus.peek().execution;
             while (moreRows) {
+                // Check if the MDX query was canceled.
+                CancellationChecker.checkCancelOrTimeout(
+                    stmt.rowCount, execution);
+
                 if (limit > 0 && limit < ++fetchCount) {
                     // result limit exceeded, throw an exception
                     throw MondrianResource.instance().MemberFetchLimitExceeded
                         .ex((long) limit);
-                }
-
-                // Check if the MDX query was canceled.
-                if (checkCancelPeriod > 0
-                    && Util.modulo(stmt.rowCount, checkCancelPeriod) == 0)
-                {
-                    execution.checkCancelOrTimeout();
                 }
 
                 if (enumTargetCount == 0) {

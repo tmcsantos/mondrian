@@ -14,6 +14,7 @@ import mondrian.calc.impl.*;
 import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
 import mondrian.server.*;
+import mondrian.util.CancellationChecker;
 
 import java.util.List;
 
@@ -155,7 +156,12 @@ class FilterFunDef extends FunDefBase {
                         list.getArity(), list.size() / 2);
                 evaluator.setNonEmpty(false);
                 TupleCursor cursor = list.tupleCursor();
+                int currentIteration = 0;
+                Execution execution =
+                    evaluator.getQuery().getStatement().getCurrentExecution();
                 while (cursor.forward()) {
+                    CancellationChecker.checkCancelOrTimeout(
+                        currentIteration++, execution);
                     cursor.setContext(evaluator);
                     if (bcalc.evaluateBoolean(evaluator)) {
                         result.addCurrent(cursor);
@@ -188,7 +194,12 @@ class FilterFunDef extends FunDefBase {
             try {
                 evaluator.setNonEmpty(false);
                 TupleCursor cursor = members.tupleCursor();
+                int currentIteration = 0;
+                Execution execution =
+                    evaluator.getQuery().getStatement().getCurrentExecution();
                 while (cursor.forward()) {
+                    CancellationChecker.checkCancelOrTimeout(
+                        currentIteration++, execution);
                     cursor.setContext(evaluator);
                     if (bcalc.evaluateBoolean(evaluator)) {
                         result.addCurrent(cursor);
@@ -221,27 +232,20 @@ class FilterFunDef extends FunDefBase {
                 icalc.evaluateIterable(evaluator);
             final Evaluator evaluator2 = evaluator.push();
             evaluator2.setNonEmpty(false);
-            final int checkCancelPeriod =
-                MondrianProperties.instance().CancelPhaseInterval.get();
             return new AbstractTupleIterable(iterable.getArity()) {
                 public TupleCursor tupleCursor() {
                     return new AbstractTupleCursor(iterable.getArity()) {
                         final TupleCursor cursor = iterable.tupleCursor();
 
                         public boolean forward() {
-                            int rowCount = -1;
+                            int currentIteration = 0;
                             if (Locus.isEmpty()) {
                                 return false;
                             }
                             Execution execution = Locus.peek().execution;
                             while (cursor.forward()) {
-                                rowCount++;
-                                if (checkCancelPeriod > 0
-                                    && Util.modulo(
-                                    rowCount, checkCancelPeriod) == 0)
-                                {
-                                    execution.checkCancelOrTimeout();
-                                }
+                                CancellationChecker.checkCancelOrTimeout(
+                                    currentIteration++, execution);
                                 cursor.setContext(evaluator2);
                                 if (bcalc.evaluateBoolean(evaluator2)) {
                                     return true;
@@ -334,7 +338,12 @@ class FilterFunDef extends FunDefBase {
             try {
                 evaluator.setNonEmpty(false);
                 final TupleCursor cursor = members0.tupleCursor();
+                int currentIteration = 0;
+                Execution execution =
+                    evaluator.getQuery().getStatement().getCurrentExecution();
                 while (cursor.forward()) {
+                    CancellationChecker.checkCancelOrTimeout(
+                        currentIteration++, execution);
                     cursor.setContext(evaluator);
                     if (bcalc.evaluateBoolean(evaluator)) {
                         result.addCurrent(cursor);
@@ -368,7 +377,12 @@ class FilterFunDef extends FunDefBase {
                 TupleList result = members0.cloneList(members0.size() / 2);
                 evaluator.setNonEmpty(false);
                 final TupleCursor cursor = members0.tupleCursor();
+                int currentIteration = 0;
+                Execution execution =
+                    evaluator.getQuery().getStatement().getCurrentExecution();
                 while (cursor.forward()) {
+                    CancellationChecker.checkCancelOrTimeout(
+                        currentIteration++, execution);
                     cursor.setContext(evaluator);
                     if (bcalc.evaluateBoolean(evaluator)) {
                         result.addCurrent(cursor);

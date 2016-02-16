@@ -10,6 +10,8 @@ package mondrian.test;
 
 import mondrian.olap.MondrianProperties;
 
+import java.util.*;
+
 /**
  * Tests DateDiff
  *
@@ -41,8 +43,11 @@ public class DateDiffTest extends FoodMartTestCase {
         propSaver.set(
             MondrianProperties.instance().IgnoreInvalidMembersDuringQuery,
             true);
+        // Time.[2015] will evaluate to Time.[#null],
+        // the algorithm will assume current year instead
+        Calendar cal = Calendar.getInstance();
         s = executeExpr2("DateDiff('y', Time.[1998], Time.[2015])");
-        assertEquals("17", s);
+        assertEquals("" + (cal.get(Calendar.YEAR)-1998), s);
         propSaver.reset();
 
         s = executeExpr2(

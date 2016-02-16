@@ -565,15 +565,12 @@ public class RolapEvaluator implements Evaluator {
         }
         int toRemove = 0;
         int size = slicerTuples.get(0).size();
-        int rowCount = -1;
+        int currentIteration = 0;
+        Execution execution = root.execution;
         boolean removeMember[] = new boolean[slicerTuples.getArity()];
         for (int i = 0; i < size; i++) {
-            rowCount++;
-            if (checkCancelPeriod > 0
-                && Util.modulo(rowCount, checkCancelPeriod) == 0)
-            {
-                root.execution.checkCancelOrTimeout();
-            }
+            CancellationChecker.checkCancelOrTimeout(
+                currentIteration++, execution);
             Hierarchy h = slicerTuples.get(0).get(i).getHierarchy();
             // check to see if the current member is overridden
             // and not expanding.

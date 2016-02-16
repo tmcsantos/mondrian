@@ -243,6 +243,7 @@ public class Execution {
             }
             throw MondrianResource.instance().QueryCanceled.ex();
         case RUNNING:
+        case TIMEOUT:
             if (timeoutTimeMillis > 0) {
                 long currTime = System.currentTimeMillis();
                 if (currTime > timeoutTimeMillis) {

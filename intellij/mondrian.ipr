@@ -73,7 +73,6 @@
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://rose:5432/FM3</jdbc-url>
-      <libraries />
     </data-source>
     <data-source source="LOCAL" name="MySQL - mondrian@rose" uuid="dcbf9f08-0637-4992-a3b9-3192b64c7d51">
       <driver-ref>mysql</driver-ref>
@@ -87,7 +86,6 @@
         <property name="characterSetResults" value="utf8" />
         <property name="yearIsDateType" value="false" />
       </driver-properties>
-      <libraries />
     </data-source>
   </component>
   <component name="DependenciesAnalyzeManager">
@@ -107,7 +105,9 @@
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
     <option name="MAXIMUM_HEAP_SIZE" value="128" />
   </component>
-  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
+  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>

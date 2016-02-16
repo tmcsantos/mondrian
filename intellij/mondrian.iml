@@ -9,9 +9,6 @@
         <webroots>
           <root url="file://$MODULE_DIR$/../demo/derby" relative="/WEB-INF" />
         </webroots>
-        <sourceRoots>
-          <root url="file://$MODULE_DIR$/../src/main" />
-        </sourceRoots>
       </configuration>
     </facet>
     <facet type="web" name="Web2">
@@ -22,9 +19,6 @@
         <webroots>
           <root url="file://$MODULE_DIR$/../webapp" relative="/" />
         </webroots>
-        <sourceRoots>
-          <root url="file://$MODULE_DIR$/../src/main" />
-        </sourceRoots>
       </configuration>
     </facet>
   </component>

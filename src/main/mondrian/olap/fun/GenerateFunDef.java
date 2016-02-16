@@ -15,6 +15,7 @@ import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
 import mondrian.olap.type.*;
 import mondrian.server.*;
+import mondrian.util.CancellationChecker;
 
 import java.util.*;
 
@@ -105,8 +106,6 @@ class GenerateFunDef extends FunDefBase {
 
         public TupleList evaluateList(Evaluator evaluator) {
             final int savepoint = evaluator.savepoint();
-            final int checkCancelPeriod =
-                MondrianProperties.instance().CancelPhaseInterval.get();
             try {
                 evaluator.setNonEmpty(false);
                 final TupleIterable iterable1 =
@@ -115,15 +114,11 @@ class GenerateFunDef extends FunDefBase {
                 TupleList result = TupleCollections.createList(arityOut);
                 if (all) {
                     final TupleCursor cursor = iterable1.tupleCursor();
-                    int rowCount = -1;
+                    int currentIteration = 0;
                     Execution execution = Locus.peek().execution;
                     while (cursor.forward()) {
-                        rowCount++;
-                        if (checkCancelPeriod > 0
-                            && Util.modulo(rowCount, checkCancelPeriod) == 0)
-                        {
-                            execution.checkCancelOrTimeout();
-                        }
+                        CancellationChecker.checkCancelOrTimeout(
+                            currentIteration++, execution);
                         cursor.setContext(evaluator);
                         final TupleList result2 =
                             listCalc2.evaluateList(evaluator);
@@ -135,14 +130,10 @@ class GenerateFunDef extends FunDefBase {
                     final TupleCursor cursor = iterable1.tupleCursor();
                     Execution execution = Locus.peek().execution;
 
-                    int rowCount = -1;
+                    int currentIteration = 0;
                     while (cursor.forward()) {
-                        rowCount++;
-                        if (checkCancelPeriod > 0
-                            && Util.modulo(rowCount, checkCancelPeriod) == 0)
-                        {
-                            execution.checkCancelOrTimeout();
-                        }
+                        CancellationChecker.checkCancelOrTimeout(
+                            currentIteration++, execution);
                         cursor.setContext(evaluator);
                         final TupleList result2 =
                                 listCalc2.evaluateList(evaluator);
