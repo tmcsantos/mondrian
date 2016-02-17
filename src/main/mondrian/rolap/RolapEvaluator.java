@@ -427,12 +427,18 @@ public class RolapEvaluator implements Evaluator {
 
     private void ensureCommandCapacity(int minCapacity) {
         if (minCapacity > commands.length) {
-            int newCapacity = commands.length * 2;
-            if (newCapacity < minCapacity) {
-                newCapacity = minCapacity;
-            }
-            commands = Util.copyOf(commands, newCapacity);
+            growCommandCapacity(minCapacity);
         }
+    }
+
+    private void growCommandCapacity(int minCapacity) {
+        // can we overflow the commands capacity?
+        int oldCapacity = commands.length;
+        int newCapacity = oldCapacity << 1;
+        if (newCapacity < minCapacity) {
+            newCapacity = minCapacity;
+        }
+        commands = Util.copyOf(commands, newCapacity);
     }
 
     /**

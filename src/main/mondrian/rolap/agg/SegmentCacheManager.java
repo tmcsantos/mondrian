@@ -1546,9 +1546,10 @@ public class SegmentCacheManager {
                     new SegmentCacheIndexImpl(thread);
                 LOGGER.trace(
                     "SegmentCacheManager.SegmentCacheIndexRegistry.getIndex:"
-                    + "Creating New Index "
+                    + "Creating And Returning New Index "
                     + System.identityHashCode(index));
                 indexes.put(star.getSchema().getChecksum(), index);
+                return index;
             }
             final SegmentCacheIndex index =
                 indexes.get(star.getSchema().getChecksum());
@@ -1611,7 +1612,7 @@ public class SegmentCacheManager {
      */
     public static final class AbortException extends RuntimeException {
         private static final long serialVersionUID = 1L;
-    };
+    }
 }
 
 // End SegmentCacheManager.java

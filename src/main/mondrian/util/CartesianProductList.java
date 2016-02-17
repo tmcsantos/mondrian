@@ -4,7 +4,7 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+* Copyright (c) 2002-2015 Pentaho Corporation..  All rights reserved.
 */
 
 package mondrian.util;
@@ -23,10 +23,16 @@ public class CartesianProductList<T>
     implements RandomAccess
 {
     private final List<List<T>> lists;
+    private final int size;
 
     public CartesianProductList(List<List<T>> lists) {
         super();
         this.lists = lists;
+        int n = 1;
+        for (List<T> list : lists) {
+            n *= list.size();
+        }
+        this.size = n;
     }
 
     @Override
@@ -44,11 +50,7 @@ public class CartesianProductList<T>
 
     @Override
     public int size() {
-        int n = 1;
-        for (List<T> list : lists) {
-            n *= list.size();
-        }
-        return n;
+        return size;
     }
 
     public void getIntoArray(int index, Object[] a) {

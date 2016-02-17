@@ -173,7 +173,7 @@ public class SegmentLoader {
         }
     }
 
-    private Map<Segment, SegmentWithData> loadImpl(
+    Map<Segment, SegmentWithData> loadImpl(
         int cellRequestCount,
         List<GroupingSet> groupingSets,
         List<StarPredicate> compoundPredicateList)
@@ -674,6 +674,8 @@ public class SegmentLoader {
             processedTypes = types;
         }
         final RowList processedRows = new RowList(processedTypes, 100);
+        final int checkCancelPeriod =
+            MondrianProperties.instance().CancelPhaseInterval.get();
 
         Execution execution = Locus.peek().execution;
         while (rawRows.next()) {

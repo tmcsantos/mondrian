@@ -60,10 +60,13 @@ public class BlockingHashMap<K, V> {
      */
     public V get(K k) throws InterruptedException {
         map.putIfAbsent(k, new SlotFuture<V>());
-        V v = Util.safeGet(
-            map.get(k),
-            "Waiting to retrieve a value from BlockingHashMap.");
-        map.remove(k);
-        return v;
+        try {
+            V v = Util.safeGet(
+                map.get(k),
+                "Waiting to retrieve a value from BlockingHashMap.");
+            return v;
+        } finally {
+            map.remove(k);
+        }
     }
 }
