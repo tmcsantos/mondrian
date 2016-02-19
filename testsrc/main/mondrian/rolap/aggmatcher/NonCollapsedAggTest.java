@@ -6,7 +6,6 @@
 *
 * Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
 */
-
 package mondrian.rolap.aggmatcher;
 
 import mondrian.olap.MondrianProperties;
@@ -245,6 +244,13 @@ public class NonCollapsedAggTest extends AggTableTestCase {
     @Override
     protected String getCubeDescription() {
         return CUBE_1;
+    }
+
+    @Override
+    public TestContext getTestContext() {
+        TestContext.instance().flushSchemaCache();
+        return TestContext.instance().create(
+            null, getCubeDescription(), null, null, null, null);
     }
 
     public void testSingleJoin() throws Exception {
