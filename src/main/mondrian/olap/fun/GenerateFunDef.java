@@ -4,7 +4,7 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2002-2015 Pentaho Corporation..  All rights reserved.
+* Copyright (c) 2002-2016 Pentaho Corporation..  All rights reserved.
 */
 
 package mondrian.olap.fun;
@@ -189,7 +189,12 @@ class GenerateFunDef extends FunDefBase {
                 final TupleIterable iter11 =
                     iterCalc.evaluateIterable(evaluator);
                 final TupleCursor cursor = iter11.tupleCursor();
+                int currentIteration = 0;
+                Execution execution =
+                    evaluator.getQuery().getStatement().getCurrentExecution();
                 while (cursor.forward()) {
+                    CancellationChecker.checkCancelOrTimeout(
+                        currentIteration++, execution);
                     cursor.setContext(evaluator);
                     if (k++ > 0) {
                         String sep = sepCalc.evaluateString(evaluator);

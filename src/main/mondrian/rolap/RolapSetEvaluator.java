@@ -4,13 +4,15 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+* Copyright (c) 2002-2016 Pentaho Corporation..  All rights reserved.
 */
 
 package mondrian.rolap;
 
 import mondrian.calc.*;
 import mondrian.olap.*;
+import mondrian.server.Execution;
+import mondrian.util.CancellationChecker;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -60,8 +62,8 @@ class RolapSetEvaluator
         this.exp = exp;
     }
 
-    public TupleIterable evaluateTupleIterable() {
-        ensureList();
+    public TupleIterable evaluateTupleIterable(Evaluator evaluator) {
+        ensureList(evaluator);
         return list;
     }
 
@@ -69,7 +71,7 @@ class RolapSetEvaluator
      * Evaluates and saves the value of this named set, if it has not been
      * evaluated already.
      */
-    private void ensureList() {
+    private void ensureList(Evaluator evaluator) {
         if (list != null) {
             if (list == DUMMY_LIST) {
                 throw rrer.result.slicerEvaluator.newEvalException(
@@ -102,7 +104,12 @@ class RolapSetEvaluator
             } else {
                 rawList = TupleCollections.createList(iterable.getArity());
                 TupleCursor cursor = iterable.tupleCursor();
+                int currentIteration = 0;
+                Execution execution =
+                    evaluator.getQuery().getStatement().getCurrentExecution();
                 while (cursor.forward()) {
+                    CancellationChecker.checkCancelOrTimeout(
+                        currentIteration++, execution);
                     rawList.addCurrent(cursor);
                 }
             }

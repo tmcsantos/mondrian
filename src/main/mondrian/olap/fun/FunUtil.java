@@ -5,7 +5,7 @@
 // You must accept the terms of that agreement to use this software.
 //
 // Copyright (C) 2002-2005 Julian Hyde
-// Copyright (C) 2005-2015 Pentaho and others
+// Copyright (C) 2005-2016 Pentaho and others
 // All Rights Reserved.
 */
 package mondrian.olap.fun;
@@ -414,7 +414,12 @@ public class FunUtil extends Util {
             assert exp.getType() instanceof ScalarType;
             Map<Member, Object> mapMemberToValue =
                 new HashMap<Member, Object>();
+            int currentIteration = 0;
+            Execution execution =
+                evaluator.getQuery().getStatement().getCurrentExecution();
             for (Member member : memberIter) {
+                CancellationChecker.checkCancelOrTimeout(
+                    currentIteration++, execution);
                 if (memberList != null) {
                     memberList.add(member);
                 }
@@ -465,7 +470,12 @@ public class FunUtil extends Util {
             assert exp.getType() instanceof ScalarType;
             final Map<List<Member>, Object> mapMemberToValue =
                     new HashMap<List<Member>, Object>();
+            int currentIteration = 0;
+            Execution execution =
+                evaluator.getQuery().getStatement().getCurrentExecution();
             for (int i = 0, count = tuples.size(); i < count; i++) {
+                CancellationChecker.checkCancelOrTimeout(
+                    currentIteration++, execution);
                 List<Member> tuple = tuples.get(i);
                 evaluator.setContext(tuple);
                 Object result = exp.evaluate(evaluator);
@@ -755,7 +765,12 @@ public class FunUtil extends Util {
         if (tupleList == null) {
             tupleList = TupleCollections.createList(arity);
             TupleCursor cursor = tupleIter.tupleCursor();
+            int currentIteration = 0;
+            Execution execution =
+                evaluator.getQuery().getStatement().getCurrentExecution();
             while (cursor.forward()) {
+                CancellationChecker.checkCancelOrTimeout(
+                    currentIteration++, execution);
                 tupleList.addCurrent(cursor);
             }
         }
@@ -1553,6 +1568,9 @@ public class FunUtil extends Util {
         if (iterable == null) {
             return 0;
         }
+        int currentIteration = 0;
+        Execution execution =
+            evaluator.getQuery().getStatement().getCurrentExecution();
         if (includeEmpty) {
             if (iterable instanceof TupleList) {
                 return ((TupleList) iterable).size();
@@ -1560,6 +1578,8 @@ public class FunUtil extends Util {
                 int retval = 0;
                 TupleCursor cursor = iterable.tupleCursor();
                 while (cursor.forward()) {
+                    CancellationChecker.checkCancelOrTimeout(
+                        currentIteration++, execution);
                     retval++;
                 }
                 return retval;
@@ -1568,6 +1588,8 @@ public class FunUtil extends Util {
             int retval = 0;
             TupleCursor cursor = iterable.tupleCursor();
             while (cursor.forward()) {
+                CancellationChecker.checkCancelOrTimeout(
+                    currentIteration++, execution);
                 cursor.setContext(evaluator);
                 if (!evaluator.currentIsEmpty()) {
                     retval++;
@@ -2781,6 +2803,8 @@ public class FunUtil extends Util {
         // puts into ascending order three items
         // (identified by index in vec[])
         // REVIEW: use only 2 comparisons??
+        // ANSWER: Can't be done with only 2 comparisons
+        // because ceil(log_2(3!)) > 2
         private void order3(int i, int j, int k) {
             if (more(vec[i], vec[j])) {
                 swap(i, j);

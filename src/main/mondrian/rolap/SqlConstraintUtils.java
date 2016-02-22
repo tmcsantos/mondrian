@@ -872,7 +872,7 @@ public class SqlConstraintUtils {
         Exp exp = fun.getArg(0);
         TupleIterable tupleIterable =
             evaluator.getSetEvaluator(
-                exp, true).evaluateTupleIterable();
+                exp, true).evaluateTupleIterable(evaluator);
         Iterable<Member> iterable = tupleIterable.slice(0);
         return iterable.iterator();
     }

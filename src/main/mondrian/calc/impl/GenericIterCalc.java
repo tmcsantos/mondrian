@@ -4,7 +4,7 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+* Copyright (c) 2002-2016 Pentaho Corporation..  All rights reserved.
 */
 
 package mondrian.calc.impl;
@@ -13,6 +13,8 @@ import mondrian.calc.*;
 import mondrian.olap.Evaluator;
 import mondrian.olap.Exp;
 import mondrian.olap.type.SetType;
+import mondrian.server.Execution;
+import mondrian.util.CancellationChecker;
 
 /**
  * Adapter which computes a set expression and converts it to any list or
@@ -61,7 +63,12 @@ public abstract class GenericIterCalc
             TupleList tupleList =
                 TupleCollections.createList(iterable.getArity());
             TupleCursor cursor = iterable.tupleCursor();
+            int currentIteration = 0;
+            Execution execution =
+                evaluator.getQuery().getStatement().getCurrentExecution();
             while (cursor.forward()) {
+                CancellationChecker.checkCancelOrTimeout(
+                    currentIteration++, execution);
                 tupleList.addCurrent(cursor);
             }
             return tupleList;

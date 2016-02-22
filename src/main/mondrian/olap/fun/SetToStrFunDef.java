@@ -4,7 +4,7 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2002-2013 Pentaho Corporation..  All rights reserved.
+* Copyright (c) 2002-2016 Pentaho Corporation..  All rights reserved.
 */
 
 package mondrian.olap.fun;
@@ -13,6 +13,8 @@ import mondrian.calc.*;
 import mondrian.calc.impl.AbstractStringCalc;
 import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
+import mondrian.server.Execution;
+import mondrian.util.CancellationChecker;
 
 import java.util.List;
 
@@ -36,19 +38,24 @@ class SetToStrFunDef extends FunDefBase {
             public String evaluateString(Evaluator evaluator) {
                 final TupleList list = listCalc.evaluateList(evaluator);
                 if (list.getArity() == 1) {
-                    return memberSetToStr(list.slice(0));
+                    return memberSetToStr(list.slice(0), evaluator);
                 } else {
-                    return tupleSetToStr(list);
+                    return tupleSetToStr(list, evaluator);
                 }
             }
         };
     }
 
-    static String memberSetToStr(List<Member> list) {
+    static String memberSetToStr(List<Member> list, Evaluator evaluator) {
         StringBuilder buf = new StringBuilder();
         buf.append("{");
         int k = 0;
+        int currentIteration = 0;
+        Execution execution =
+            evaluator.getQuery().getStatement().getCurrentExecution();
         for (Member member : list) {
+            CancellationChecker.checkCancelOrTimeout(
+                currentIteration++, execution);
             if (k++ > 0) {
                 buf.append(", ");
             }
@@ -58,13 +65,18 @@ class SetToStrFunDef extends FunDefBase {
         return buf.toString();
     }
 
-    static String tupleSetToStr(TupleList list) {
+    static String tupleSetToStr(TupleList list, Evaluator evaluator) {
         StringBuilder buf = new StringBuilder();
         buf.append("{");
         int k = 0;
         Member[] members = new Member[list.getArity()];
         final TupleCursor cursor = list.tupleCursor();
+        int currentIteration = 0;
+        Execution execution =
+            evaluator.getQuery().getStatement().getCurrentExecution();
         while (cursor.forward()) {
+            CancellationChecker.checkCancelOrTimeout(
+                currentIteration++, execution);
             if (k++ > 0) {
                 buf.append(", ");
             }

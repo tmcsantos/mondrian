@@ -5,7 +5,7 @@
 // You must accept the terms of that agreement to use this software.
 //
 // Copyright (C) 2001-2005 Julian Hyde
-// Copyright (C) 2005-2015 Pentaho and others
+// Copyright (C) 2005-2016 Pentaho and others
 // All Rights Reserved.
 */
 package mondrian.rolap;
@@ -1098,8 +1098,12 @@ public class RolapResult extends ResultBase {
                     // account all the tuples.
                     TupleIterable iterable = (TupleIterable) preliminaryValue;
                     final TupleCursor cursor = iterable.tupleCursor();
+                    int currentIteration = 0;
+                    Execution execution =
+                        evaluator.getQuery().getStatement().getCurrentExecution();
                     while (cursor.forward()) {
-                        // ignore
+                        CancellationChecker.checkCancelOrTimeout(
+                            currentIteration++, execution);
                     }
                 }
 
@@ -1591,7 +1595,10 @@ public class RolapResult extends ResultBase {
         }
 
         private void mergeTupleIter(TupleCursor cursor) {
+            int currentIteration = 0;
             while (cursor.forward()) {
+                CancellationChecker.checkCancelOrTimeout(
+                    currentIteration++, execution);
                 mergeTuple(cursor);
             }
         }
@@ -1608,10 +1615,7 @@ public class RolapResult extends ResultBase {
 
         private void mergeTuple(final TupleCursor cursor) {
             final int arity = cursor.getArity();
-            int currentIteration = 0;
             for (int i = 0; i < arity; i++) {
-                CancellationChecker.checkCancelOrTimeout(
-                    currentIteration++, execution);
                 mergeMember(cursor.member(i));
             }
         }

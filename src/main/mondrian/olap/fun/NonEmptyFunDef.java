@@ -4,7 +4,7 @@
 * http://www.eclipse.org/legal/epl-v10.html.
 * You must accept the terms of that agreement to use this software.
 *
-* Copyright (c) 2015 Pentaho Corporation..  All rights reserved.
+* Copyright (c) 2015-2016 Pentaho Corporation..  All rights reserved.
 */
 
 package mondrian.olap.fun;
@@ -14,6 +14,8 @@ import mondrian.calc.impl.AbstractListCalc;
 import mondrian.mdx.ResolvedFunCall;
 import mondrian.olap.*;
 import mondrian.rolap.RolapEvaluator;
+import mondrian.server.Execution;
+import mondrian.util.CancellationChecker;
 
 /**
  * Definition of the <code>NonEmpty</code> MDX function.
@@ -97,7 +99,12 @@ public class NonEmptyFunDef extends FunDefBase {
         try {
             evaluator.setNonEmpty(false);
             final TupleCursor cursor = list.tupleCursor();
+            int currentIteration = 0;
+            Execution execution =
+                evaluator.getQuery().getStatement().getCurrentExecution();
             while (cursor.forward()) {
+                CancellationChecker.checkCancelOrTimeout(
+                    currentIteration++, execution);
                 cursor.setContext(evaluator);
                 if (checkData(calc, evaluator)) {
                     result.addCurrent(cursor);
