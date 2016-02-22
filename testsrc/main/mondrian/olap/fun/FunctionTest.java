@@ -12,8 +12,7 @@ package mondrian.olap.fun;
 
 import mondrian.olap.*;
 import mondrian.resource.MondrianResource;
-import mondrian.test.FoodMartTestCase;
-import mondrian.test.TestContext;
+import mondrian.test.*;
 import mondrian.udf.*;
 import mondrian.util.Bug;
 
@@ -6960,10 +6959,15 @@ public class FunctionTest extends FoodMartTestCase {
         propSaver.set(propSaver.properties.QueryTimeout, 5);
         propSaver.set(propSaver.properties.EnableNativeNonEmpty, false);
         try {
-            getTestContext().executeAxis(
-                "Filter("
-                + "Filter(CrossJoin([Customers].[Name].members, [Product].[Product Name].members), [Measures].[Unit Sales] > 0),"
-                + " [Measures].[Sales Count] > 5) ");
+            final TestContext tc = TestContext.instance().create(
+                null, null, null, null,
+                "<UserDefinedFunction name=\"SleepUdf\" className=\""
+                + BasicQueryTest.SleepUdf.class.getName()
+                + "\"/>", null);
+            tc.executeAxis(
+                  "Filter("
+                  + "Filter(CrossJoin([Customers].[Name].members, [Product].[Product Name].members), SleepUdf([Measures].[Unit Sales]) > 0),"
+                  + " SleepUdf([Measures].[Sales Count]) > 5) ");
         } catch (QueryTimeoutException e) {
             return;
         } catch (CancellationException e) {
