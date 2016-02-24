@@ -95,16 +95,16 @@ public class ExasolDialect extends JdbcDialectImpl {
     }
 
     @Override
-    public boolean supportsMultiValueInExpr() {
-        return true;
-    }
-
-    @Override
     public boolean supportsUnlimitedValueList() {
         return true;
     }
 
-        @Override
+    @Override
+    public boolean supportsResultSetConcurrency(int type, int concurrency) {
+        return false;
+    }
+
+    @Override
     public SqlStatement.Type getType(
             ResultSetMetaData metaData, int columnIndex)
             throws SQLException

@@ -5,7 +5,7 @@
 // You must accept the terms of that agreement to use this software.
 //
 // Copyright (C) 2003-2005 Julian Hyde
-// Copyright (C) 2005-2015 Pentaho
+// Copyright (C) 2005-2016 Pentaho
 // All Rights Reserved.
 //
 // jhyde, Feb 14, 2003
@@ -199,8 +199,8 @@ public class DrillThroughTest extends FoodMartTestCase {
         final Cell cell = result.getCell(new int[]{});
         assertTrue(cell.canDrillThrough());
         assertEquals(3584, cell.getDrillThroughCount());
-        getTestContext().assertSqlEquals(
-            "select\n"
+        final Dialect dialect = TestContext.instance().getDialect();
+        String expected = "select\n"
             + "    time_by_day.the_year as Year,\n"
             + "    promotion.media_type as Media Type,\n"
             + "    sales_fact_1997.unit_sales as Unit Sales\n"
@@ -214,11 +214,19 @@ public class DrillThroughTest extends FoodMartTestCase {
             + "    time_by_day.the_year = 1997\n"
             + "and\n"
             + "    sales_fact_1997.promotion_id = promotion.promotion_id\n"
-            + "and\n"
-            + "    ((promotion.media_type in "
-            + "('Bulk Mail', 'Cash Register Handout')))\n"
-            + "order by\n"
-            + "    time_by_day.the_year ASC",
+            + "and\n";
+        // EXASOL parser bug
+        if(dialect.getDatabaseProduct() == Dialect.DatabaseProduct.EXASOL) {
+            expected += "    ((true and promotion.media_type in "
+                + "('Bulk Mail', 'Cash Register Handout')))\n";
+        } else {
+            expected += "    ((promotion.media_type in "
+                + "('Bulk Mail', 'Cash Register Handout')))\n";
+        }
+        expected += "order by\n"
+            + "    time_by_day.the_year ASC";
+        getTestContext().assertSqlEquals(
+            expected,
             cell.getDrillThroughSQL(false), 3584);
     }
 
