@@ -291,6 +291,7 @@ public class Main extends TestSuite {
             addTest(suite, NullValueTest.class);
             addTest(suite, NamedSetTest.class);
             addTest(suite, NativeSetEvaluationTest.class);
+            addTest(suite, AggCrossjoinNativeTest.class);
             addTest(suite, PropertiesTest.class);
             addTest(suite, MultipleHierarchyTest.class);
             addTest(suite, I18nTest.class);

@@ -873,8 +873,19 @@ public class SqlConstraintUtils {
         TupleIterable tupleIterable =
             evaluator.getSetEvaluator(
                 exp, true).evaluateTupleIterable(evaluator);
-        Iterable<Member> iterable = tupleIterable.slice(0);
-        return iterable.iterator();
+
+        List<Member> iterList = new ArrayList<>();
+        Iterator<List<Member>> tupleIterator = tupleIterable.iterator();
+
+        List<Member> currentMembers;
+        while(tupleIterator.hasNext()) {
+            currentMembers = tupleIterator.next();
+            if (currentMembers.size() > 0) {
+                iterList.addAll(currentMembers);
+            }
+        }
+
+        return iterList.iterator();
     }
 
     /**
