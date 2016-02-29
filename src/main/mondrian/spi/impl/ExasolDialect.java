@@ -127,5 +127,4 @@ public class ExasolDialect extends JdbcDialectImpl {
         }
         return internalType;
     }
-
 }

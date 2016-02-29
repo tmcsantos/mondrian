@@ -111,25 +111,25 @@ public class SqlQueryTest extends BatchTestCase {
             "\norder by\n"
             + "    CASE WHEN alias IS NULL THEN 1 ELSE 0 END, alias ASC",
             makeTestSqlQuery("expr", "alias", true, true, true, true)
-            .toString());
+            .toString().replaceAll("\r\n", "\n"));
         // requireAlias = false
         assertEquals(
             "\norder by\n"
             + "    CASE WHEN expr IS NULL THEN 1 ELSE 0 END, expr ASC",
             makeTestSqlQuery("expr", "alias", true, true, true, false)
-                .toString());
+                .toString().replaceAll("\r\n", "\n"));
         //  nullable = false
         assertEquals(
             "\norder by\n"
             + "    expr ASC",
             makeTestSqlQuery("expr", "alias", true, false, true, false)
-                .toString());
+                .toString().replaceAll("\r\n", "\n"));
         //  ascending=false, collateNullsLast=false
         assertEquals(
             "\norder by\n"
             + "    CASE WHEN alias IS NULL THEN 0 ELSE 1 END, alias DESC",
             makeTestSqlQuery("expr", "alias", false, true, false, true)
-                .toString());
+                .toString().replaceAll("\r\n", "\n"));
     }
 
     /**

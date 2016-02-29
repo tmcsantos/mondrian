@@ -145,8 +145,10 @@ public class Main extends TestSuite {
 
         System.out.println("testName: " + testName);
         System.out.println("testClass: " + testClass);
-        System.out.println(
-            "java.version: " + System.getProperty("java.version"));
+        System.out.println("java.version: " + System.getProperty("java.version"));
+        System.out.println("TimeZone: " + TimeZone.getDefault().getDisplayName());
+        System.out.println("Locale: " + Locale.getDefault().getDisplayName());
+        System.out.println("Encoding: " + System.getProperty("file.encoding"));
 
         TestSuite suite = new TestSuite();
         if (testClass != null && !testClass.equals("")) {

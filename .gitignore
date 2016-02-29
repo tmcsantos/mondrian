@@ -4,10 +4,12 @@ build
 dev-lib
 dist
 doc/api
+.idea
 
 *.jar
 *.log
 *.log.*
+*.iml
 VERSION.txt
 classes/
 demo/FoodMartCreateData.sql
