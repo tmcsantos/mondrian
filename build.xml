@@ -87,7 +87,7 @@
   <property name="junit.sysprop.user.region" value="US"/>
 
 
-  <property name="log4j.configuration" value="log4j.properties" />
+  <property name="log4j.configuration" value="log4j.xml" />
 
   <property name="generated.java.files" value="
 ${java.dir}/mondrian/olap/Parser.java,
@@ -376,7 +376,7 @@ demo/FoodMartCreateData.sql"/>
       </fileset>
     </unjar>
 
-    <copy file="./log4j.xml" todir="${crtmp.dir}"/>
+    <copy file="./testsrc/main/log4j.xml" todir="${crtmp.dir}"/>
 
     <jar destfile="${lib.dir}/cmdrunner.jar" >
       <fileset dir="${crtmp.dir}" >
