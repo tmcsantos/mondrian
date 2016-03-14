@@ -67,6 +67,8 @@ public class FastBatchingCellReader implements CellReader {
      */
     private int pendingCount;
 
+    private int phaseCount;
+
     private final AggregationManager aggMgr;
 
     private final boolean cacheEnabled;
@@ -167,11 +169,16 @@ public class FastBatchingCellReader implements CellReader {
         return pendingCount;
     }
 
+    public int getPhaseCount() {
+        return phaseCount;
+    }
+
     public final void recordCellRequest(CellRequest request) {
         assert !request.isUnsatisfiable();
         ++missCount;
         cellRequests.add(request);
         if (cellRequests.size() % cellRequestLimit == 0) {
+            ++phaseCount;
             // Signal that it's time to ask the cache manager if it has cells
             // we need in the cache. Not really an exception.
             throw CellRequestQuantumExceededException.INSTANCE;
@@ -247,6 +254,7 @@ public class FastBatchingCellReader implements CellReader {
                         cacheMgr,
                         getDialect(),
                         cube,
+                        getPhaseCount(),
                         Collections.unmodifiableList(cellRequests1)));
 
             int failureCount = 0;
@@ -556,6 +564,7 @@ class BatchLoader {
     private final SegmentCacheManager cacheMgr;
     private final Dialect dialect;
     private final RolapCube cube;
+    private final int phaseCount;
 
     private final Map<AggregationKey, Batch> batches =
         new HashMap<AggregationKey, Batch>();
@@ -583,6 +592,21 @@ class BatchLoader {
         this.cacheMgr = cacheMgr;
         this.dialect = dialect;
         this.cube = cube;
+        this.phaseCount = 0;
+    }
+
+    public BatchLoader(
+        Locus locus,
+        SegmentCacheManager cacheMgr,
+        Dialect dialect,
+        RolapCube cube,
+        int phaseCount)
+    {
+        this.locus = locus;
+        this.cacheMgr = cacheMgr;
+        this.dialect = dialect;
+        this.cube = cube;
+        this.phaseCount = phaseCount;
     }
 
     final boolean shouldUseGroupingFunction() {
@@ -835,7 +859,7 @@ class BatchLoader {
         // Finally, add to a batch. It will turn in to a SQL request.
         Batch batch = batches.get(key);
         if (batch == null) {
-            batch = new Batch(request);
+            batch = new Batch(request, phaseCount);
             batches.put(key, batch);
             converterMap.put(
                 SegmentCacheIndexImpl.makeConverterKey(request, key),
@@ -997,6 +1021,7 @@ class BatchLoader {
         private final SegmentCacheManager cacheMgr;
         private final Dialect dialect;
         private final RolapCube cube;
+        private final int phaseCount;
         private final List<CellRequest> cellRequests;
         private final Map<String, Object> mdc =
             new HashMap<String, Object>();
@@ -1006,12 +1031,14 @@ class BatchLoader {
             SegmentCacheManager cacheMgr,
             Dialect dialect,
             RolapCube cube,
+            int phaseCount,
             List<CellRequest> cellRequests)
         {
             this.locus = locus;
             this.cacheMgr = cacheMgr;
             this.dialect = dialect;
             this.cube = cube;
+            this.phaseCount = phaseCount;
             this.cellRequests = cellRequests;
 
             if (MDC.getContext() != null) {
@@ -1025,7 +1052,7 @@ class BatchLoader {
                 old.clear();
                 old.putAll(mdc);
             }
-            return new BatchLoader(locus, cacheMgr, dialect, cube)
+            return new BatchLoader(locus, cacheMgr, dialect, cube, phaseCount)
                 .load(cellRequests);
         }
 
@@ -1178,10 +1205,22 @@ class BatchLoader {
         // string representation; for debug; set lazily in toString
         private String string;
         private int cellRequestCount;
+        private int phaseCount;
         private List<StarColumnPredicate[]> tuples =
             new ArrayList<StarColumnPredicate[]>();
 
         public Batch(CellRequest request) {
+            this.phaseCount = 0;
+            columns = request.getConstrainedColumns();
+            valueSets = new HashSet[columns.length];
+            for (int i = 0; i < valueSets.length; i++) {
+                valueSets[i] = new HashSet<StarColumnPredicate>();
+            }
+            batchKey = new AggregationKey(request);
+        }
+
+        public Batch(CellRequest request, int phaseCount) {
+            this.phaseCount = phaseCount;
             columns = request.getConstrainedColumns();
             valueSets = new HashSet[columns.length];
             for (int i = 0; i < valueSets.length; i++) {
@@ -1310,6 +1349,7 @@ class BatchLoader {
                         columns,
                         batchKey,
                         predicates,
+                        phaseCount,
                         groupingSetsCollector,
                         segmentFutures);
                     measuresList.remove(measure);
@@ -1325,6 +1365,7 @@ class BatchLoader {
                     columns,
                     batchKey,
                     predicates,
+                    phaseCount,
                     groupingSetsCollector,
                     segmentFutures);
             }
@@ -1374,6 +1415,7 @@ class BatchLoader {
                     columns,
                     batchKey,
                     predicates,
+                    phaseCount,
                     groupingSetsCollector,
                     segmentFutures);
             }
