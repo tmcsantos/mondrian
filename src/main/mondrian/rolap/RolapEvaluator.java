@@ -273,14 +273,12 @@ public class RolapEvaluator implements Evaluator {
     }
 
     public boolean currentIsEmpty() {
-        // If a cell evaluates to null, it is always deemed empty.
-        Object o = evaluateCurrent();
-        if (o == Util.nullValue || o == null) {
-            return true;
-        }
+        Object o;
         final RolapCube measureCube = getMeasureCube();
         if (measureCube == null) {
-            return false;
+            // If a cell evaluates to null, it is always deemed empty.
+            o = evaluateCurrent();
+            return o == Util.nullValue || o == null;
         }
         // For other cell values (e.g. zero), the cell is deemed empty if the
         // number of fact table rows is zero.
@@ -291,7 +289,7 @@ public class RolapEvaluator implements Evaluator {
         } finally {
             restore(savepoint);
         }
-        return o == null
+        return o == Util.nullValue || o == null
            || (o instanceof Number && ((Number) o).intValue() == 0);
     }
 

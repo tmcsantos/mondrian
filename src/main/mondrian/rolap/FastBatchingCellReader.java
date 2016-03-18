@@ -1206,8 +1206,6 @@ class BatchLoader {
         private String string;
         private int cellRequestCount;
         private int phaseCount;
-        private List<StarColumnPredicate[]> tuples =
-            new ArrayList<StarColumnPredicate[]>();
 
         public Batch(CellRequest request) {
             this.phaseCount = 0;
@@ -1248,14 +1246,10 @@ class BatchLoader {
         public final void add(CellRequest request) {
             ++cellRequestCount;
             final int valueCount = request.getNumValues();
-            final StarColumnPredicate[] tuple =
-                new StarColumnPredicate[valueCount];
             for (int j = 0; j < valueCount; j++) {
                 final StarColumnPredicate value = request.getValueAt(j);
                 valueSets[j].add(value);
-                tuple[j] = value;
             }
-            tuples.add(tuple);
             final RolapStar.Measure measure = request.getMeasure();
             if (!measuresList.contains(measure)) {
                 assert (measuresList.size() == 0)
