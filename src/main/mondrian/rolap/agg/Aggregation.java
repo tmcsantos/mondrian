@@ -64,8 +64,6 @@ public class Aggregation {
      */
     private final int maxConstraints;
 
-    private final int cellBatchSize;
-
     /**
      * Timestamp of when the aggregation was created. (We use
      * {@link java.util.Date} rather than {@link java.sql.Timestamp} because it
@@ -88,8 +86,6 @@ public class Aggregation {
             aggregationKey.getConstrainedColumnsBitKey();
         this.maxConstraints =
             MondrianProperties.instance().MaxConstraints.get();
-        this.cellBatchSize =
-            MondrianProperties.instance().CellBatchSize.get();
         this.creationTimestamp = new Date();
     }
 
@@ -196,8 +192,7 @@ public class Aggregation {
      */
     public StarColumnPredicate[] optimizePredicates(
         RolapStar.Column[] columns,
-        StarColumnPredicate[] predicates,
-        int phaseCount)
+        StarColumnPredicate[] predicates)
     {
         if (predicates.length == 0) {
             return predicates;
@@ -234,13 +229,6 @@ public class Aggregation {
             final int valueCount = predicateList.size();
             if (valueCount < 2) {
                 bloats[i] = 0.0;
-                continue;
-            }
-            final int maxPhaseCount =
-                (columns[i].getCardinality() / cellBatchSize) >> 2;
-
-            if (maxPhaseCount > 0 && phaseCount >= maxPhaseCount) {
-                bloats[i] = 1.0; // will be optimized away
                 continue;
             }
 

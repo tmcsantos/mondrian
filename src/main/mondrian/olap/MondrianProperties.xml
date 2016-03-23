@@ -57,6 +57,21 @@ number of cells that are batched together when building segments.
         <Default>-1</Default>
     </PropertyDefinition>
     <PropertyDefinition>
+        <Name>PredicateOptimizerThreshold</Name>
+        <Path>mondrian.rolap.optimizer.predicateThreshold</Path>
+        <Description>
+            <p>Property that defines
+                when to apply the predicate optimizer algorithm.</p>
+
+            <p>If a predicate value list's size is larger than this property's
+                value, then the predicate optimizer is applied.
+                Setting this value to '0' means that for all predicates
+                will have the optimizer applied.</p>
+        </Description>
+        <Type>double</Type>
+        <Default>0.5</Default>
+    </PropertyDefinition>
+    <PropertyDefinition>
         <Name>ResultLimit</Name>
         <Path>mondrian.result.limit</Path>
         <Description>

@@ -98,7 +98,6 @@ public class AggregationManager extends RolapAggregationManager {
         RolapStar.Column[] columns,
         AggregationKey aggregationKey,
         StarColumnPredicate[] predicates,
-        int phaseCount,
         GroupingSetsCollector groupingSetsCollector,
         List<Future<Map<Segment, SegmentWithData>>> segmentFutures)
     {
@@ -109,7 +108,7 @@ public class AggregationManager extends RolapAggregationManager {
         // try to eliminate unnecessary constraints
         // for Oracle: prevent an IN-clause with more than 1000 elements
         predicates =
-            aggregation.optimizePredicates(columns, predicates, phaseCount);
+            aggregation.optimizePredicates(columns, predicates);
         aggregation.load(
             cacheMgr, cellRequestCount, columns, measures, predicates,
             groupingSetsCollector, segmentFutures);

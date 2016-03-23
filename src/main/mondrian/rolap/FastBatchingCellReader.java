@@ -1206,9 +1206,12 @@ class BatchLoader {
         private String string;
         private int cellRequestCount;
         private int phaseCount;
+        private double predicateThreshold;
 
         public Batch(CellRequest request) {
             this.phaseCount = 0;
+            this.predicateThreshold =
+                MondrianProperties.instance().PredicateOptimizerThreshold.get();
             columns = request.getConstrainedColumns();
             valueSets = new HashSet[columns.length];
             for (int i = 0; i < valueSets.length; i++) {
@@ -1219,6 +1222,8 @@ class BatchLoader {
 
         public Batch(CellRequest request, int phaseCount) {
             this.phaseCount = phaseCount;
+            this.predicateThreshold =
+                MondrianProperties.instance().PredicateOptimizerThreshold.get();
             columns = request.getConstrainedColumns();
             valueSets = new HashSet[columns.length];
             for (int i = 0; i < valueSets.length; i++) {
@@ -1299,10 +1304,6 @@ class BatchLoader {
             final StarColumnPredicate[] predicates = initPredicates();
             final long t1 = System.currentTimeMillis();
 
-            // TODO: optimize key sets; drop a constraint if more than x% of
-            // the members are requested; whether we should get just the cells
-            // requested or expand to a n-cube
-
             // If the database cannot execute "count(distinct ...)", split the
             // distinct aggregations out.
             int distinctMeasureCount = getDistinctMeasureCount(measuresList);
@@ -1343,7 +1344,6 @@ class BatchLoader {
                         columns,
                         batchKey,
                         predicates,
-                        phaseCount,
                         groupingSetsCollector,
                         segmentFutures);
                     measuresList.remove(measure);
@@ -1359,7 +1359,6 @@ class BatchLoader {
                     columns,
                     batchKey,
                     predicates,
-                    phaseCount,
                     groupingSetsCollector,
                     segmentFutures);
             }
@@ -1409,7 +1408,6 @@ class BatchLoader {
                     columns,
                     batchKey,
                     predicates,
-                    phaseCount,
                     groupingSetsCollector,
                     segmentFutures);
             }
@@ -1418,6 +1416,8 @@ class BatchLoader {
         private StarColumnPredicate[] initPredicates() {
             StarColumnPredicate[] predicates =
                 new StarColumnPredicate[columns.length];
+            final boolean optimizePredicates =
+                MondrianProperties.instance().OptimizePredicates.get();
             for (int j = 0; j < columns.length; j++) {
                 Set<StarColumnPredicate> valueSet = valueSets[j];
 
@@ -1425,18 +1425,26 @@ class BatchLoader {
                 if (valueSet == null) {
                     predicate = LiteralStarPredicate.FALSE;
                 } else {
-                    ValueColumnPredicate[] values =
-                        valueSet.toArray(
-                            new ValueColumnPredicate[valueSet.size()]);
-                    // Sort array to achieve determinism in generated SQL.
-                    Arrays.sort(
-                        values,
-                        ValueColumnConstraintComparator.instance);
+                    final double bloat = phaseCount +
+                        (valueSet.size() / columns[j].getCardinality());
 
-                    predicate =
-                        new ListColumnPredicate(
-                            columns[j],
-                            Arrays.asList((StarColumnPredicate[]) values));
+                    // check if cellbatchsize is iterating over the elements,
+                    // we should drop this constraint and get the job done.
+                    if (optimizePredicates && bloat > predicateThreshold) {
+                        predicate = new LiteralStarPredicate(columns[j], true);
+                    } else {
+                        ValueColumnPredicate[] values =
+                            valueSet.toArray(
+                                new ValueColumnPredicate[valueSet.size()]);
+                        // Sort array to achieve determinism in generated SQL.
+                        Arrays.sort(
+                            values,
+                            ValueColumnConstraintComparator.instance);
+
+                            predicate = new ListColumnPredicate(
+                                columns[j],
+                                Arrays.asList((StarColumnPredicate[]) values));
+                    }
                 }
 
                 predicates[j] = predicate;
