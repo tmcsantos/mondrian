@@ -1416,8 +1416,9 @@ class BatchLoader {
         private StarColumnPredicate[] initPredicates() {
             StarColumnPredicate[] predicates =
                 new StarColumnPredicate[columns.length];
-            final boolean optimizePredicates =
-                MondrianProperties.instance().OptimizePredicates.get();
+            // reverting for now
+            final boolean optimizePredicates = false;
+                //MondrianProperties.instance().OptimizePredicates.get();
             for (int j = 0; j < columns.length; j++) {
                 Set<StarColumnPredicate> valueSet = valueSets[j];
 
