@@ -11,7 +11,7 @@ package mondrian.olap.fun;
 
 import mondrian.calc.*;
 import mondrian.calc.impl.AbstractIntegerCalc;
-import mondrian.mdx.ResolvedFunCall;
+import mondrian.mdx.*;
 import mondrian.olap.*;
 
 /**
@@ -37,14 +37,31 @@ class CountFunDef extends AbstractAggregateFunDef {
         super(dummyFunDef);
     }
 
+    @Override
+    protected Exp validateArg(Validator validator, Exp[] args, int i, int category) {
+        Exp exp = super.validateArg(validator, args, i, category);
+
+        if(i == 0){
+            // Wrap set to be counted with NonEmpty function if EXCLUDEEMPTY was passed
+            // Count(<set>, EXCLUDEEMPTY) -> Count(NonEmpty(<set>))
+            // Count(<set>, INCLUDEEMPTY) -> Count(<set>)
+            // By doing this, the behaviour from here will always be the "INCLUDEEMPTY" one
+            if(args.length == 2 && ((Literal)args[1]).getValue().equals("EXCLUDEEMPTY")){
+                UnresolvedFunCall newExp = new UnresolvedFunCall(
+                    NonEmptyFunDef.NAME,
+                    Syntax.Function,
+                    new Exp[]{exp});
+                exp = validator.validate(newExp, false);
+            }
+        }
+
+        return exp;
+    }
+
     public Calc compileCall(ResolvedFunCall call, ExpCompiler compiler) {
         final Calc calc =
             compiler.compileAs(
                 call.getArg(0), null, ResultStyle.ITERABLE_ANY);
-        final boolean includeEmpty =
-            call.getArgCount() < 2
-            || ((Literal) call.getArg(1)).getValue().equals(
-                "INCLUDEEMPTY");
         return new AbstractIntegerCalc(
             call,
             new Calc[] {calc})
@@ -56,15 +73,13 @@ class CountFunDef extends AbstractAggregateFunDef {
                     final int count;
                     if (calc instanceof IterCalc) {
                         IterCalc iterCalc = (IterCalc) calc;
-                        TupleIterable iterable =
-                            evaluateCurrentIterable(iterCalc, evaluator);
-                        count = count(evaluator, iterable, includeEmpty);
+                        TupleIterable iterable = evaluateCurrentIterable(iterCalc, evaluator);
+                        count = count(evaluator, iterable, true);
                     } else {
                         // must be ListCalc
                         ListCalc listCalc = (ListCalc) calc;
-                        TupleList list =
-                            evaluateCurrentList(listCalc, evaluator);
-                        count = count(evaluator, list, includeEmpty);
+                        TupleList list = evaluateCurrentList(listCalc, evaluator);
+                        count = count(evaluator, list, true);
                     }
                     return count;
                 } finally {
@@ -73,58 +88,9 @@ class CountFunDef extends AbstractAggregateFunDef {
             }
 
             public boolean dependsOn(Hierarchy hierarchy) {
-                // COUNT(<set>, INCLUDEEMPTY) is straightforward -- it
-                // depends only on the dimensions that <Set> depends
-                // on.
-                if (super.dependsOn(hierarchy)) {
-                    return true;
-                }
-                if (includeEmpty) {
-                    return false;
-                }
-                // COUNT(<set>, EXCLUDEEMPTY) depends only on the
-                // dimensions that <Set> depends on, plus all
-                // dimensions not masked by the set.
-                return ! calc.getType().usesHierarchy(hierarchy, true);
+                return super.dependsOn(hierarchy);
             }
         };
-
-/*
- RME OLD STUFF
-        final ListCalc memberListCalc =
-                compiler.compileList(call.getArg(0));
-        final boolean includeEmpty =
-                call.getArgCount() < 2 ||
-                ((Literal) call.getArg(1)).getValue().equals(
-                        "INCLUDEEMPTY");
-        return new AbstractIntegerCalc(
-                call, new Calc[] {memberListCalc}) {
-            public int evaluateInteger(Evaluator evaluator) {
-                List memberList =
-                    evaluateCurrentList(memberListCalc, evaluator);
-                return count(evaluator, memberList, includeEmpty);
-            }
-
-            public boolean dependsOn(Dimension dimension) {
-                // COUNT(<set>, INCLUDEEMPTY) is straightforward -- it
-                // depends only on the dimensions that <Set> depends
-                // on.
-                if (super.dependsOn(dimension)) {
-                    return true;
-                }
-                if (includeEmpty) {
-                    return false;
-                }
-                // COUNT(<set>, EXCLUDEEMPTY) depends only on the
-                // dimensions that <Set> depends on, plus all
-                // dimensions not masked by the set.
-                if (memberListCalc.getType().usesDimension(dimension, true)) {
-                    return false;
-                }
-                return true;
-            }
-        };
-*/
     }
 }
 

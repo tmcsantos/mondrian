@@ -24,6 +24,7 @@ import mondrian.util.CancellationChecker;
  * @since Out 19, 2015
  */
 public class NonEmptyFunDef extends FunDefBase {
+    static final String NAME = "NonEmpty";
     static final ReflectiveMultiResolver resolver =
         new ReflectiveMultiResolver(
             "NonEmpty",
