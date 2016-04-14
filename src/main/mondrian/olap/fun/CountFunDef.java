@@ -39,8 +39,6 @@ class CountFunDef extends AbstractAggregateFunDef {
 
     @Override
     protected Exp validateArg(Validator validator, Exp[] args, int i, int category) {
-        Exp exp = super.validateArg(validator, args, i, category);
-
         if(i == 0){
             // Wrap set to be counted with NonEmpty function if EXCLUDEEMPTY was passed
             // Count(<set>, EXCLUDEEMPTY) -> Count(NonEmpty(<set>))
@@ -50,12 +48,12 @@ class CountFunDef extends AbstractAggregateFunDef {
                 UnresolvedFunCall newExp = new UnresolvedFunCall(
                     NonEmptyFunDef.NAME,
                     Syntax.Function,
-                    new Exp[]{exp});
-                exp = validator.validate(newExp, false);
+                    new Exp[]{args[i]});
+                args[i] = validator.validate(newExp, false);
             }
         }
 
-        return exp;
+        return super.validateArg(validator, args, i, category);
     }
 
     public Calc compileCall(ResolvedFunCall call, ExpCompiler compiler) {
