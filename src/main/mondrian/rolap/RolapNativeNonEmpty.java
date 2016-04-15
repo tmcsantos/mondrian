@@ -83,7 +83,17 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
             return null;
         }
 
-        if (args.length > 2) {
+        final Exp memberExpr;
+        if (args.length == 1) {
+            //we gonna use the default measure if not calculated.
+            memberExpr = null;
+            final Member measure = evaluator.getMembers()[0];
+            if (measure.isCalculated()) {
+                return null;
+            }
+        } else if (args.length == 2) {
+            memberExpr = args[1];
+        } else {
             return null;
         }
 
@@ -117,7 +127,6 @@ public class RolapNativeNonEmpty  extends RolapNativeSet {
             new RolapNativeSql(
                 sqlQuery, null, evaluator, cjArgs[0].getLevel());
 
-        final Exp memberExpr = (args.length == 2) ? args[1] : null;
         if (memberExpr != null) {
             String filterExprStr = sql.generateFilterCondition(memberExpr);
             if (filterExprStr == null) {
